@@ -262,7 +262,7 @@ abstract class <CLASSNAME_ABSTRACT>
         $this->responseDecoded = json_decode($this->response);
 
         // validate response
-        if(!is_array($this->responseDecoded))
+        if(!is_object($this->responseDecoded) && !is_array($this->responseDecoded))
             throw new Exception('Could not decode JSON response.');
         if(array_key_exists('error', $this->responseDecoded))
             throw new Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);

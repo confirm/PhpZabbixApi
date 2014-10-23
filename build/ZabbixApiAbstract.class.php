@@ -34,7 +34,7 @@
  * @copyright   GNU General Public License
  * @author      confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
  *
- * @version     $Id: ZabbixApiAbstract.class.php 190 2013-05-07 14:18:57Z dbarton $
+ * @version     $Id: abstract.tpl.php 190 2013-05-07 14:18:57Z dbarton $
  */
 
 /**
@@ -208,20 +208,32 @@ abstract class ZabbixApiAbstract
         $this->id = number_format(microtime(true), 4, '', '');
 
         // build request array
-        $this->request = array(
-            'jsonrpc' => '2.0',
-            'method'  => $method,
-            'params'  => $params,
-            'auth'    => ($auth ? $this->auth : ''),
-            'id'      => $this->id
-        );
+        if ($auth)
+        {
+            $this->request = array(
+                'jsonrpc' => '2.0',
+                'method'  => $method,
+                'params'  => $params,
+                'auth'    => ($auth ? $this->auth : ''),
+                'id'      => $this->id
+            );
+        }
+        else
+        {
+            $this->request = array(
+                'jsonrpc' => '2.0',
+                'method'  => $method,
+                'params'  => $params,
+                'id'      => $this->id
+            );
+        }
 
         // encode request array
         $this->requestEncoded = json_encode($this->request);
 
         // debug logging
         if($this->printCommunication)
-            echo 'API request: '.$this->requestEncoded."\n";
+            echo 'API request: '.$this->requestEncoded;
 
         // do request
         $streamContext = stream_context_create(array('http' => array(
@@ -240,7 +252,7 @@ abstract class ZabbixApiAbstract
 
         // debug logging
         if($this->printCommunication)
-            echo 'API response: '.$this->response."\n";
+            echo $this->response."\n";
 
         // response verification
         if($this->response === FALSE)
@@ -250,6 +262,8 @@ abstract class ZabbixApiAbstract
         $this->responseDecoded = json_decode($this->response);
 
         // validate response
+        if(!is_object($this->responseDecoded) && !is_array($this->responseDecoded))
+            throw new Exception('Could not decode JSON response.');
         if(array_key_exists('error', $this->responseDecoded))
             throw new Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);
 
@@ -409,7 +423,7 @@ abstract class ZabbixApiAbstract
         return $this->request('user.logout', $params, $arrayKeyProperty);
     }
 
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.get.
@@ -439,7 +453,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.exists.
@@ -469,7 +483,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.create.
@@ -499,7 +513,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.update.
@@ -529,7 +543,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.delete.
@@ -559,10 +573,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method action.validateOperations.
+     *          method action.validateOperationsIntegrity.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -581,45 +595,15 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function actionValidateOperations($params=array(), $arrayKeyProperty='')
+    public function actionValidateOperationsIntegrity($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('action.validateOperations', $params, $arrayKeyProperty);
+        return $this->request('action.validateOperationsIntegrity', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method action.validateConditions.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function actionValidateConditions($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('action.validateConditions', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method action.validateOperationConditions.
@@ -649,7 +633,157 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('action.validateOperationConditions', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method action.validateCreate.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function actionValidateCreate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('action.validateCreate', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method action.validateUpdate.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function actionValidateUpdate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('action.validateUpdate', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method action.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function actionTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('action.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method action.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function actionPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('action.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method action.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function actionPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('action.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method alert.get.
@@ -679,7 +813,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('alert.get', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method alert.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function alertTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('alert.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method alert.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function alertPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('alert.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method alert.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function alertPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('alert.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method apiinfo.version.
@@ -709,7 +933,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('apiinfo.version', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method apiinfo.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function apiinfoTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('apiinfo.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method apiinfo.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function apiinfoPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('apiinfo.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method apiinfo.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function apiinfoPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('apiinfo.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.get.
@@ -739,7 +1053,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.exists.
@@ -769,7 +1083,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.checkInput.
@@ -799,7 +1113,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.checkInput', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.create.
@@ -829,7 +1143,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.update.
@@ -859,7 +1173,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.delete.
@@ -889,7 +1203,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method application.massAdd.
@@ -919,10 +1233,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('application.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method application.syncTemplates.
+     *          method application.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -941,15 +1255,75 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function applicationSyncTemplates($params=array(), $arrayKeyProperty='')
+    public function applicationTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('application.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('application.tableName', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method application.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function applicationPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('application.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method application.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function applicationPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('application.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method configuration.export.
@@ -979,7 +1353,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('configuration.export', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method configuration.import.
@@ -1009,7 +1383,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('configuration.import', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method configuration.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function configurationTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('configuration.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method configuration.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function configurationPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('configuration.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method configuration.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function configurationPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('configuration.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dcheck.get.
@@ -1039,7 +1503,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dcheck.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dcheck.isReadable.
@@ -1069,7 +1533,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dcheck.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dcheck.isWritable.
@@ -1099,7 +1563,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dcheck.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method dcheck.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function dcheckTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('dcheck.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method dcheck.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function dcheckPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('dcheck.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method dcheck.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function dcheckPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('dcheck.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dhost.get.
@@ -1129,7 +1683,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dhost.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dhost.exists.
@@ -1159,10 +1713,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dhost.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dhost.create.
+     *          method dhost.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1181,18 +1735,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dhostCreate($params=array(), $arrayKeyProperty='')
+    public function dhostTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dhost.create', $params, $arrayKeyProperty);
+        return $this->request('dhost.tableName', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dhost.update.
+     *          method dhost.pk.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1211,18 +1765,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dhostUpdate($params=array(), $arrayKeyProperty='')
+    public function dhostPk($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dhost.update', $params, $arrayKeyProperty);
+        return $this->request('dhost.pk', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dhost.delete.
+     *          method dhost.pkOption.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1241,15 +1795,15 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dhostDelete($params=array(), $arrayKeyProperty='')
+    public function dhostPkOption($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dhost.delete', $params, $arrayKeyProperty);
+        return $this->request('dhost.pkOption', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.get.
@@ -1279,7 +1833,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.exists.
@@ -1309,7 +1863,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.create.
@@ -1339,7 +1893,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.update.
@@ -1369,7 +1923,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.delete.
@@ -1399,7 +1953,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.copy.
@@ -1429,7 +1983,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.copy', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.syncTemplates.
@@ -1459,7 +2013,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.syncTemplates', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.isReadable.
@@ -1489,7 +2043,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.isWritable.
@@ -1519,7 +2073,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.isWritable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method discoveryrule.findInterfaceForItem.
@@ -1549,7 +2103,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('discoveryrule.findInterfaceForItem', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method discoveryrule.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function discoveryruleTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('discoveryrule.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method discoveryrule.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function discoveryrulePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('discoveryrule.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method discoveryrule.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function discoveryrulePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('discoveryrule.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.get.
@@ -1579,7 +2223,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.exists.
@@ -1609,7 +2253,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.checkInput.
@@ -1639,7 +2283,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.checkInput', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.create.
@@ -1669,7 +2313,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.update.
@@ -1699,7 +2343,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.delete.
@@ -1729,7 +2373,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.isReadable.
@@ -1759,7 +2403,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method drule.isWritable.
@@ -1789,7 +2433,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('drule.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method drule.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function druleTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('drule.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method drule.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function drulePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('drule.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method drule.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function drulePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('drule.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dservice.get.
@@ -1819,7 +2553,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dservice.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method dservice.exists.
@@ -1849,10 +2583,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('dservice.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dservice.create.
+     *          method dservice.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1871,18 +2605,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dserviceCreate($params=array(), $arrayKeyProperty='')
+    public function dserviceTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dservice.create', $params, $arrayKeyProperty);
+        return $this->request('dservice.tableName', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dservice.update.
+     *          method dservice.pk.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1901,18 +2635,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dserviceUpdate($params=array(), $arrayKeyProperty='')
+    public function dservicePk($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dservice.update', $params, $arrayKeyProperty);
+        return $this->request('dservice.pk', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method dservice.delete.
+     *          method dservice.pkOption.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -1931,15 +2665,15 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function dserviceDelete($params=array(), $arrayKeyProperty='')
+    public function dservicePkOption($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('dservice.delete', $params, $arrayKeyProperty);
+        return $this->request('dservice.pkOption', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method event.get.
@@ -1969,7 +2703,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('event.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method event.acknowledge.
@@ -1999,7 +2733,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('event.acknowledge', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method event.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function eventTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('event.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method event.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function eventPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('event.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method event.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function eventPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('event.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.get.
@@ -2029,7 +2853,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.syncTemplates.
@@ -2059,7 +2883,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.syncTemplates', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.delete.
@@ -2089,7 +2913,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.update.
@@ -2119,7 +2943,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.create.
@@ -2149,7 +2973,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.exists.
@@ -2179,7 +3003,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graph.getObjects.
@@ -2209,7 +3033,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graph.getObjects', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graph.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function graphTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graph.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graph.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function graphPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graph.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graph.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function graphPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graph.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphitem.get.
@@ -2239,10 +3153,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphitem.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method graphitem.getObjects.
+     *          method graphitem.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -2261,15 +3175,75 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function graphitemGetObjects($params=array(), $arrayKeyProperty='')
+    public function graphitemTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('graphitem.getObjects', $params, $arrayKeyProperty);
+        return $this->request('graphitem.tableName', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graphitem.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function graphitemPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graphitem.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graphitem.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function graphitemPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graphitem.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.get.
@@ -2299,7 +3273,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.syncTemplates.
@@ -2329,7 +3303,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.syncTemplates', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.delete.
@@ -2359,7 +3333,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.update.
@@ -2389,7 +3363,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.create.
@@ -2419,7 +3393,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.exists.
@@ -2449,7 +3423,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method graphprototype.getObjects.
@@ -2479,7 +3453,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('graphprototype.getObjects', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graphprototype.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function graphprototypeTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graphprototype.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graphprototype.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function graphprototypePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graphprototype.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method graphprototype.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function graphprototypePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('graphprototype.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.get.
@@ -2509,7 +3573,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.getObjects.
@@ -2539,7 +3603,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.exists.
@@ -2569,7 +3633,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.create.
@@ -2599,7 +3663,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.update.
@@ -2629,7 +3693,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.massAdd.
@@ -2659,7 +3723,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.massUpdate.
@@ -2689,7 +3753,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.massUpdate', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.massRemove.
@@ -2719,7 +3783,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.massRemove', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.delete.
@@ -2749,7 +3813,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.isReadable.
@@ -2779,7 +3843,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method host.isWritable.
@@ -2809,7 +3873,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('host.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method host.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function hostTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('host.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method host.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('host.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method host.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('host.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.get.
@@ -2839,7 +3993,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.getObjects.
@@ -2869,7 +4023,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.exists.
@@ -2899,7 +4053,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.create.
@@ -2929,7 +4083,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.update.
@@ -2959,7 +4113,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.delete.
@@ -2989,7 +4143,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.massAdd.
@@ -3019,7 +4173,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.massRemove.
@@ -3049,7 +4203,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.massRemove', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.massUpdate.
@@ -3079,7 +4233,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.massUpdate', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.isReadable.
@@ -3109,7 +4263,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostgroup.isWritable.
@@ -3139,7 +4293,397 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostgroup.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostgroup.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function hostgroupTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostgroup.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostgroup.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostgroupPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostgroup.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostgroup.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostgroupPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostgroup.pkOption', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.get.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeGet($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.get', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.create.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeCreate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.create', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.update.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeUpdate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.update', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.syncTemplates.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeSyncTemplates($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.syncTemplates', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.delete.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeDelete($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.delete', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.isReadable.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeIsReadable($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.isReadable', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.isWritable.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeIsWritable($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.isWritable', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypeTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostprototype.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostprototypePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostprototype.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method history.get.
@@ -3169,10 +4713,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('history.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method history.create.
+     *          method history.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -3191,18 +4735,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function historyCreate($params=array(), $arrayKeyProperty='')
+    public function historyTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('history.create', $params, $arrayKeyProperty);
+        return $this->request('history.tableName', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method history.delete.
+     *          method history.pk.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -3221,15 +4765,45 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function historyDelete($params=array(), $arrayKeyProperty='')
+    public function historyPk($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('history.delete', $params, $arrayKeyProperty);
+        return $this->request('history.pk', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method history.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function historyPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('history.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.get.
@@ -3259,7 +4833,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.exists.
@@ -3289,7 +4863,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.checkInput.
@@ -3319,7 +4893,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.checkInput', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.create.
@@ -3349,7 +4923,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.update.
@@ -3379,7 +4953,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.delete.
@@ -3409,7 +4983,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.massAdd.
@@ -3439,7 +5013,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.massRemove.
@@ -3469,7 +5043,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.massRemove', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method hostinterface.replaceHostInterfaces.
@@ -3499,7 +5073,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('hostinterface.replaceHostInterfaces', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostinterface.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function hostinterfaceTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostinterface.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostinterface.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostinterfacePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostinterface.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method hostinterface.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function hostinterfacePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('hostinterface.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.get.
@@ -3529,7 +5193,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.getObjects.
@@ -3559,7 +5223,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.exists.
@@ -3589,7 +5253,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.create.
@@ -3619,7 +5283,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.update.
@@ -3649,7 +5313,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method image.delete.
@@ -3679,7 +5343,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('image.delete', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method image.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function imageTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('image.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method image.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function imagePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('image.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method image.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function imagePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('image.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.get.
@@ -3709,7 +5463,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.create.
@@ -3739,7 +5493,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.update.
@@ -3769,7 +5523,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.delete.
@@ -3799,7 +5553,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.isReadable.
@@ -3829,7 +5583,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method iconmap.isWritable.
@@ -3859,7 +5613,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('iconmap.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method iconmap.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function iconmapTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('iconmap.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method iconmap.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function iconmapPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('iconmap.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method iconmap.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function iconmapPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('iconmap.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.get.
@@ -3889,7 +5733,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.getObjects.
@@ -3919,7 +5763,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.exists.
@@ -3949,7 +5793,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.create.
@@ -3979,7 +5823,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.update.
@@ -4009,7 +5853,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.delete.
@@ -4039,7 +5883,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.syncTemplates.
@@ -4069,7 +5913,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.syncTemplates', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.validateInventoryLinks.
@@ -4099,7 +5943,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.validateInventoryLinks', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.addRelatedObjects.
@@ -4129,7 +5973,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.addRelatedObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.findInterfaceForItem.
@@ -4159,7 +6003,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.findInterfaceForItem', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.isReadable.
@@ -4189,7 +6033,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method item.isWritable.
@@ -4219,7 +6063,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('item.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method item.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function itemTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('item.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method item.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function itemPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('item.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method item.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function itemPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('item.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.get.
@@ -4249,7 +6183,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.exists.
@@ -4279,7 +6213,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.create.
@@ -4309,7 +6243,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.update.
@@ -4339,7 +6273,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.delete.
@@ -4369,7 +6303,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.syncTemplates.
@@ -4399,7 +6333,37 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.syncTemplates', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method itemprototype.addRelatedObjects.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function itemprototypeAddRelatedObjects($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('itemprototype.addRelatedObjects', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.findInterfaceForItem.
@@ -4429,7 +6393,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.findInterfaceForItem', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.isReadable.
@@ -4459,7 +6423,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method itemprototype.isWritable.
@@ -4489,7 +6453,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('itemprototype.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method itemprototype.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function itemprototypeTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('itemprototype.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method itemprototype.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function itemprototypePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('itemprototype.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method itemprototype.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function itemprototypePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('itemprototype.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method maintenance.get.
@@ -4519,7 +6573,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('maintenance.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method maintenance.exists.
@@ -4549,7 +6603,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('maintenance.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method maintenance.create.
@@ -4579,7 +6633,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('maintenance.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method maintenance.update.
@@ -4609,7 +6663,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('maintenance.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method maintenance.delete.
@@ -4639,7 +6693,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('maintenance.delete', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method maintenance.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function maintenanceTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('maintenance.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method maintenance.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function maintenancePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('maintenance.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method maintenance.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function maintenancePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('maintenance.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.get.
@@ -4669,7 +6813,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.getObjects.
@@ -4699,7 +6843,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.exists.
@@ -4729,7 +6873,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.checkInput.
@@ -4759,7 +6903,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.checkInput', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.create.
@@ -4789,7 +6933,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.update.
@@ -4819,7 +6963,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.delete.
@@ -4849,7 +6993,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.isReadable.
@@ -4879,7 +7023,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.isWritable.
@@ -4909,7 +7053,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.isWritable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method map.checkCircleSelementsLink.
@@ -4939,7 +7083,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('map.checkCircleSelementsLink', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method map.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function mapTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('map.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method map.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function mapPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('map.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method map.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function mapPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('map.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method mediatype.get.
@@ -4969,7 +7203,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('mediatype.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method mediatype.create.
@@ -4999,7 +7233,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('mediatype.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method mediatype.update.
@@ -5029,7 +7263,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('mediatype.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method mediatype.delete.
@@ -5059,7 +7293,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('mediatype.delete', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method mediatype.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function mediatypeTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('mediatype.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method mediatype.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function mediatypePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('mediatype.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method mediatype.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function mediatypePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('mediatype.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.get.
@@ -5089,7 +7413,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.create.
@@ -5119,7 +7443,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.update.
@@ -5149,7 +7473,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.delete.
@@ -5179,7 +7503,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.isReadable.
@@ -5209,7 +7533,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method proxy.isWritable.
@@ -5239,7 +7563,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('proxy.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method proxy.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function proxyTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('proxy.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method proxy.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function proxyPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('proxy.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method proxy.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function proxyPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('proxy.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.get.
@@ -5269,7 +7683,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.create.
@@ -5299,7 +7713,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.validateUpdate.
@@ -5329,7 +7743,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.validateUpdate', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.update.
@@ -5359,7 +7773,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.validateDelete.
@@ -5389,7 +7803,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.validateDelete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.delete.
@@ -5419,7 +7833,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.addDependencies.
@@ -5449,7 +7863,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.addDependencies', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.deleteDependencies.
@@ -5479,7 +7893,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.deleteDependencies', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.validateAddTimes.
@@ -5509,7 +7923,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.validateAddTimes', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.addTimes.
@@ -5539,7 +7953,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.addTimes', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.getSla.
@@ -5569,7 +7983,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.getSla', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.deleteTimes.
@@ -5599,7 +8013,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.deleteTimes', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.isReadable.
@@ -5629,7 +8043,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method service.isWritable.
@@ -5659,10 +8073,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('service.isWritable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method service.expandPeriodicalTimes.
+     *          method service.tableName.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -5681,15 +8095,75 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function serviceExpandPeriodicalTimes($params=array(), $arrayKeyProperty='')
+    public function serviceTableName($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('service.expandPeriodicalTimes', $params, $arrayKeyProperty);
+        return $this->request('service.tableName', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method service.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function servicePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('service.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method service.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function servicePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('service.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screen.get.
@@ -5719,7 +8193,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screen.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screen.exists.
@@ -5749,7 +8223,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screen.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screen.create.
@@ -5779,7 +8253,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screen.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screen.update.
@@ -5809,7 +8283,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screen.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screen.delete.
@@ -5839,7 +8313,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screen.delete', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screen.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function screenTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screen.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screen.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function screenPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screen.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screen.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function screenPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screen.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.get.
@@ -5869,7 +8433,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.create.
@@ -5899,7 +8463,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.update.
@@ -5929,7 +8493,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.updateByPosition.
@@ -5959,7 +8523,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.updateByPosition', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.delete.
@@ -5989,7 +8553,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.isReadable.
@@ -6019,7 +8583,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method screenitem.isWritable.
@@ -6049,7 +8613,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('screenitem.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screenitem.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function screenitemTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screenitem.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screenitem.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function screenitemPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screenitem.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method screenitem.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function screenitemPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('screenitem.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.get.
@@ -6079,37 +8733,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.get', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method script.getObjects.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function scriptGetObjects($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('script.getObjects', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.create.
@@ -6139,7 +8763,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.update.
@@ -6169,7 +8793,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.delete.
@@ -6199,7 +8823,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.execute.
@@ -6229,7 +8853,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.execute', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method script.getScriptsByHosts.
@@ -6259,7 +8883,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('script.getScriptsByHosts', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method script.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function scriptTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('script.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method script.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function scriptPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('script.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method script.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function scriptPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('script.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.pkOption.
@@ -6289,7 +9003,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.pkOption', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.get.
@@ -6319,7 +9033,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.getObjects.
@@ -6349,7 +9063,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.exists.
@@ -6379,7 +9093,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.create.
@@ -6409,7 +9123,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.update.
@@ -6439,7 +9153,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.delete.
@@ -6469,7 +9183,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.massAdd.
@@ -6499,7 +9213,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.massUpdate.
@@ -6529,7 +9243,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.massUpdate', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.massRemove.
@@ -6559,7 +9273,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.massRemove', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.isReadable.
@@ -6589,7 +9303,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method template.isWritable.
@@ -6619,7 +9333,67 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('template.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method template.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function templateTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('template.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method template.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('template.pk', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method templatescreen.get.
@@ -6649,7 +9423,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('templatescreen.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method templatescreen.exists.
@@ -6679,97 +9453,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('templatescreen.exists', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method templatescreen.create.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function templatescreenCreate($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('templatescreen.create', $params, $arrayKeyProperty);
-    }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method templatescreen.update.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function templatescreenUpdate($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('templatescreen.update', $params, $arrayKeyProperty);
-    }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method templatescreen.delete.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function templatescreenDelete($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('templatescreen.delete', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method templatescreen.copy.
@@ -6799,10 +9483,10 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('templatescreen.copy', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method templatescreen.isReadable.
+     *          method templatescreen.update.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -6821,18 +9505,18 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function templatescreenIsReadable($params=array(), $arrayKeyProperty='')
+    public function templatescreenUpdate($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('templatescreen.isReadable', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method templatescreen.isWritable.
+     *          method templatescreen.create.
      *
      * The $params Array can be used, to pass through params to the Zabbix API.
      * For more informations about this params, check the Zabbix API
@@ -6851,15 +9535,135 @@ abstract class ZabbixApiAbstract
      * @throws  Exception
      */
 
-    public function templatescreenIsWritable($params=array(), $arrayKeyProperty='')
+    public function templatescreenCreate($params=array(), $arrayKeyProperty='')
     {
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
         // request
-        return $this->request('templatescreen.isWritable', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.create', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreen.delete.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function templatescreenDelete($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreen.delete', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreen.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatescreenTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreen.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreen.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatescreenPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreen.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreen.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatescreenPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreen.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method templatescreenitem.get.
@@ -6889,7 +9693,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('templatescreenitem.get', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreenitem.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function templatescreenitemTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreenitem.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreenitem.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatescreenitemPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreenitem.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method templatescreenitem.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function templatescreenitemPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('templatescreenitem.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.get.
@@ -6919,7 +9813,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.getObjects.
@@ -6949,7 +9843,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.exists.
@@ -6979,7 +9873,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.checkInput.
@@ -7009,7 +9903,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.checkInput', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.create.
@@ -7039,7 +9933,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.update.
@@ -7069,7 +9963,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.delete.
@@ -7099,7 +9993,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.addDependencies.
@@ -7129,7 +10023,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.addDependencies', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.deleteDependencies.
@@ -7159,7 +10053,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.deleteDependencies', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.syncTemplates.
@@ -7189,7 +10083,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.syncTemplates', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.syncTemplateDependencies.
@@ -7219,7 +10113,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.syncTemplateDependencies', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.isReadable.
@@ -7249,7 +10143,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method trigger.isWritable.
@@ -7279,7 +10173,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('trigger.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method trigger.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function triggerTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('trigger.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method trigger.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function triggerPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('trigger.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method trigger.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function triggerPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('trigger.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method triggerprototype.get.
@@ -7309,7 +10293,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('triggerprototype.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method triggerprototype.create.
@@ -7339,7 +10323,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('triggerprototype.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method triggerprototype.update.
@@ -7369,7 +10353,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('triggerprototype.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method triggerprototype.delete.
@@ -7399,7 +10383,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('triggerprototype.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method triggerprototype.syncTemplates.
@@ -7429,7 +10413,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('triggerprototype.syncTemplates', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method triggerprototype.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function triggerprototypeTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('triggerprototype.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method triggerprototype.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function triggerprototypePk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('triggerprototype.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method triggerprototype.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function triggerprototypePkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('triggerprototype.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.get.
@@ -7459,7 +10533,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.create.
@@ -7489,7 +10563,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.update.
@@ -7519,7 +10593,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.updateProfile.
@@ -7549,7 +10623,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.updateProfile', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.delete.
@@ -7579,7 +10653,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.addMedia.
@@ -7609,37 +10683,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.addMedia', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method user.deleteMedia.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function userDeleteMedia($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('user.deleteMedia', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.updateMedia.
@@ -7669,7 +10713,67 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.updateMedia', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method user.deleteMedia.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function userDeleteMedia($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('user.deleteMedia', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method user.deleteMediaReal.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function userDeleteMediaReal($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('user.deleteMediaReal', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.checkAuthentication.
@@ -7699,7 +10803,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.checkAuthentication', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.isReadable.
@@ -7729,7 +10833,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method user.isWritable.
@@ -7759,7 +10863,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('user.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method user.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function userTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('user.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method user.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function userPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('user.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method user.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function userPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('user.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.get.
@@ -7789,7 +10983,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.getObjects.
@@ -7819,7 +11013,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.getObjects', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.exists.
@@ -7849,7 +11043,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.exists', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.create.
@@ -7879,7 +11073,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.update.
@@ -7909,7 +11103,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.massAdd.
@@ -7939,7 +11133,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.massAdd', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.massUpdate.
@@ -7969,37 +11163,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.massUpdate', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method usergroup.massRemove.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function usergroupMassRemove($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('usergroup.massRemove', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.delete.
@@ -8029,7 +11193,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.isReadable.
@@ -8059,7 +11223,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usergroup.isWritable.
@@ -8089,7 +11253,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usergroup.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usergroup.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function usergroupTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usergroup.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usergroup.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usergroupPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usergroup.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usergroup.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usergroupPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usergroup.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.get.
@@ -8119,7 +11373,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.createGlobal.
@@ -8149,7 +11403,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.createGlobal', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.updateGlobal.
@@ -8179,7 +11433,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.updateGlobal', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.deleteGlobal.
@@ -8209,7 +11463,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.deleteGlobal', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.create.
@@ -8239,7 +11493,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.update.
@@ -8269,7 +11523,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.delete.
@@ -8299,97 +11553,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.delete', $params, $arrayKeyProperty);
     }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method usermacro.getMacros.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function usermacroGetMacros($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('usermacro.getMacros', $params, $arrayKeyProperty);
-    }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method usermacro.resolveTrigger.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function usermacroResolveTrigger($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('usermacro.resolveTrigger', $params, $arrayKeyProperty);
-    }
-
-    /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
-     *          method usermacro.resolveItem.
-     *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
-     *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
-     *
-     * @param   $params             Parameters to pass through.
-     * @param   $arrayKeyProperty   Object property for key of array.
-     *
-     * @retval  stdClass
-     *
-     * @throws  Exception
-     */
-
-    public function usermacroResolveItem($params=array(), $arrayKeyProperty='')
-    {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // request
-        return $this->request('usermacro.resolveItem', $params, $arrayKeyProperty);
-    }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermacro.replaceMacros.
@@ -8419,7 +11583,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermacro.replaceMacros', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermacro.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function usermacroTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermacro.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermacro.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usermacroPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermacro.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermacro.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usermacroPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermacro.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method usermedia.get.
@@ -8449,7 +11703,367 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('usermedia.get', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermedia.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function usermediaTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermedia.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermedia.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usermediaPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermedia.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method usermedia.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function usermediaPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('usermedia.pkOption', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.get.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestGet($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.get', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.create.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestCreate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.create', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.update.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestUpdate($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.update', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.delete.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestDelete($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.delete', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.isReadable.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestIsReadable($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.isReadable', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.isWritable.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestIsWritable($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.isWritable', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method httptest.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function httptestPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('httptest.pkOption', $params, $arrayKeyProperty);
+    }
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.get.
@@ -8479,7 +12093,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.get', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.create.
@@ -8509,7 +12123,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.create', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.update.
@@ -8539,7 +12153,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.update', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.delete.
@@ -8569,7 +12183,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.delete', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.isReadable.
@@ -8599,7 +12213,7 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.isReadable', $params, $arrayKeyProperty);
     }
-
+    
     /**
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method webcheck.isWritable.
@@ -8629,7 +12243,97 @@ abstract class ZabbixApiAbstract
         // request
         return $this->request('webcheck.isWritable', $params, $arrayKeyProperty);
     }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method webcheck.tableName.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
 
+    public function webcheckTableName($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('webcheck.tableName', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method webcheck.pk.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function webcheckPk($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('webcheck.pk', $params, $arrayKeyProperty);
+    }
+    
+    /**
+     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     *          method webcheck.pkOption.
+     *
+     * The $params Array can be used, to pass through params to the Zabbix API.
+     * For more informations about this params, check the Zabbix API
+     * Documentation.
+     *
+     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
+     * associatve instead of an indexed array as response. A valid value for
+     * this $arrayKeyProperty is any property of the returned JSON objects
+     * (e.g. name, host, hostid, graphid, screenitemid).
+     *
+     * @param   $params             Parameters to pass through.
+     * @param   $arrayKeyProperty   Object property for key of array.
+     *
+     * @retval  stdClass
+     *
+     * @throws  Exception
+     */
+
+    public function webcheckPkOption($params=array(), $arrayKeyProperty='')
+    {
+        // get params array for request
+        $params = $this->getRequestParamsArray($params);
+
+        // request
+        return $this->request('webcheck.pkOption', $params, $arrayKeyProperty);
+    }
+    
 
 }
 

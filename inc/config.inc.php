@@ -90,9 +90,15 @@ define('PATH_ZABBIX_API_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/API.php')
  *
  * This class file is required by all API class files, because they're
  * inherit from the contained CZBXAPI class.
+ *
+ * Zabbix 2.2 and below:
+ * define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CZBXAPI.php');
+ *
+ * Zabbix 2.4+:
+ * define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CApiService.php');
  */
 
-define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CZBXAPI.php');
+define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CApiService.php');
 
 /**
  * @brief   Path to the api/classes/ directory of the Zabbix PHP front-end.
@@ -101,7 +107,13 @@ define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CZBXA
  *
  * This directory and the contained class files will be used, to determine all
  * available methods for each API class.
+ *
+ * Zabbix 2.2 and below:
+ * define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/api/classes');
+ *
+ * Zabbix 2.4+:
+ * define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/include/classes/api/services');
  */
 
-define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/api/classes');
+define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/include/classes/api/services');
 ?>
