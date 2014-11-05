@@ -34,17 +34,55 @@
     require 'inc/replacePlaceholders.func.php';
 
 /*
- * Sanity checks.
+ * Define some pathes and do some sanity checks for existence of the pathes.
  */
+
+    if(!is_dir(PATH_ZABBIX))
+        die('ERROR: Zabbix path "'.PATH_ZABBIX.'" is not a directory! Please check the PATH_ZABBIX configuration constant.');
+
+    // load Zabbix internal constants, to access ZABBIX_API_VERSION
+    require PATH_ZABBIX.'/include/defines.inc.php';
+
+    /**
+     * @brief   Path to the API.php class file of the Zabbix PHP front-end.
+     *
+     * This class file will be used, to determine all available API classes.
+     */
+
+    define('PATH_ZABBIX_API_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/API.php');
 
     if(!file_exists(PATH_ZABBIX_API_CLASS_FILE))
         die('ERROR: API class file "'.PATH_ZABBIX_API_CLASS_FILE.'" not found! Please check the PATH_ZABBIX_API_CLASS_FILE configuration constant');
 
+    /**
+     * @brief   Path to the CZBXAPI.php class file of the Zabbix PHP front-end.
+     *
+     * This class file is required by all API class files, because they're
+     * inherit from the contained CZBXAPI class.
+     */
+
+    if(version_compare(ZABBIX_API_VERSION, '2.4') >= 0)
+        define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CApiService.php');
+    else
+        define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CZBXAPI.php');
+
     if(!file_exists(PATH_ZABBIX_CZBXAPI_CLASS_FILE))
-        die('ERROR: CZBXAPI class file "'.PATH_ZABBIX_CZBXAPI_CLASS_FILE.'" not found! Please check the PATH_ZABBIX_CZBXAPI_CLASS_FILE configuration constant');
+        die('ERROR: CZBXAPI class file "'.PATH_ZABBIX_CZBXAPI_CLASS_FILE.'" not found!');
+
+    /**
+     * @brief   Path to the api/classes/ directory of the Zabbix PHP front-end.
+     *
+     * This directory and the contained class files will be used, to determine all
+     * available methods for each API class.
+     */
+
+    if(version_compare(ZABBIX_API_VERSION, '2.4') >= 0)
+        define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/include/classes/api/services');
+    else
+        define('PATH_ZABBIX_API_CLASSES_DIRECTORY', PATH_ZABBIX.'/api/classes');
 
     if(!is_dir(PATH_ZABBIX_API_CLASSES_DIRECTORY))
-        die('ERROR: API class directory "'.PATH_ZABBIX_API_CLASSES_DIRECTORY.'" not found! Please check the PATH_ZABBIX_API_CLASSES_DIRECTORY configuration constant');
+        die('ERROR: API class directory "'.PATH_ZABBIX_API_CLASSES_DIRECTORY.'" not found!');
 
 /*
  * Initialize.
