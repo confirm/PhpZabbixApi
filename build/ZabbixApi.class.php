@@ -22,8 +22,6 @@
  *
  * @copyright   GNU General Public License
  * @author      confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
- *
- * @version     $Id: ZabbixApi.class.php 138 2012-10-08 08:00:24Z dbarton $
  */
 
 /**

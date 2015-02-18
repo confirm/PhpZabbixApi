@@ -21,8 +21,6 @@
  *
  * @copyright   GNU General Public License
  * @author      confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
- *
- * @version     $Id: config.inc.php 134 2012-08-20 15:44:55Z dbarton $
  */
 
 /**

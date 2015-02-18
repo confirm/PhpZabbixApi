@@ -33,8 +33,6 @@
  *
  * @copyright   GNU General Public License
  * @author      confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
- *
- * @version     $Id: abstract.tpl.php 190 2013-05-07 14:18:57Z dbarton $
  */
 
 /**
