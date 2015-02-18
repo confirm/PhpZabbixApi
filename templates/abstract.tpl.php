@@ -416,9 +416,10 @@ abstract class <CLASSNAME_ABSTRACT>
 
     final public function userLogout($params=array(), $arrayKeyProperty='')
     {
-        $params = $this->getRequestParamsArray($params);
+        $params   = $this->getRequestParamsArray($params);
+        $response = $this->request('user.logout', $params, $arrayKeyProperty);
         $this->auth = '';
-        return $this->request('user.logout', $params, $arrayKeyProperty);
+        return $response;
     }
 
     <!START_API_METHOD>
