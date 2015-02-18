@@ -53,21 +53,6 @@
         die('ERROR: API class file "'.PATH_ZABBIX_API_CLASS_FILE.'" not found! Please check the PATH_ZABBIX_API_CLASS_FILE configuration constant');
 
     /**
-     * @brief   Path to the CZBXAPI.php class file of the Zabbix PHP front-end.
-     *
-     * This class file is required by all API class files, because they're
-     * inherit from the contained CZBXAPI class.
-     */
-
-    if(version_compare(ZABBIX_API_VERSION, '2.4') >= 0)
-        define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CApiService.php');
-    else
-        define('PATH_ZABBIX_CZBXAPI_CLASS_FILE', PATH_ZABBIX.'/include/classes/api/CZBXAPI.php');
-
-    if(!file_exists(PATH_ZABBIX_CZBXAPI_CLASS_FILE))
-        die('ERROR: CZBXAPI class file "'.PATH_ZABBIX_CZBXAPI_CLASS_FILE.'" not found!');
-
-    /**
      * @brief   Path to the api/classes/ directory of the Zabbix PHP front-end.
      *
      * This directory and the contained class files will be used, to determine all
@@ -98,64 +83,49 @@
     );
 
 /*
- * Load API.
+ * Create class-map class.
  *
- * Load the origin API of the Zabbix PHP front-end and extend it to get the
- * protected class map array.
+ * Create a new class and extend it from the origin Zabbix classes, so that we
+ * can fetch the class map directly from the Zabbix classes without defining
+ * it here.
+ * 
+ * There are some differences between the Zabbix versions:
+ *
+ *  < 2.4:  The class map is stored as a static property directly in the 
+ *          origin API class. 
+ *
+ *  >= 2.4: The class map is stored as an instance property in the 
+ *          origin CApiServiceFactory class.
  */
 
     // load API
     require PATH_ZABBIX_API_CLASS_FILE;
 
-    // extend API w/ static function to get protected classMap array
-    class API_extended extends API
+    // create new class to fetch class map for API classes
+    if(version_compare(ZABBIX_API_VERSION, '2.4') >= 0)
     {
-        public static function getClassMap()
+        require PATH_ZABBIX.'/include/classes/core/CRegistryFactory.php';
+        require PATH_ZABBIX.'/include/classes/api/CApiServiceFactory.php';
+        require PATH_ZABBIX.'/include/classes/api/CApiService.php';
+
+        class ZabbixApiClassMap extends CApiServiceFactory
         {
-            return $classMap_Zabbix24 = array(
-                'action' => 'CAction',
-                'alert' => 'CAlert',
-                'apiinfo' => 'CAPIInfo',
-                'application' => 'CApplication',
-                'configuration' => 'CConfiguration',
-                'dcheck' => 'CDCheck',
-                'dhost' => 'CDHost',
-                'discoveryrule' => 'CDiscoveryRule',
-                'drule' => 'CDRule',
-                'dservice' => 'CDService',
-                'event' => 'CEvent',
-                'graph' => 'CGraph',
-                'graphitem' => 'CGraphItem',
-                'graphprototype' => 'CGraphPrototype',
-                'host' => 'CHost',
-                'hostgroup' => 'CHostGroup',
-                'hostprototype' => 'CHostPrototype',
-                'history' => 'CHistory',
-                'hostinterface' => 'CHostInterface',
-                'image' => 'CImage',
-                'iconmap' => 'CIconMap',
-                'item' => 'CItem',
-                'itemprototype' => 'CItemPrototype',
-                'maintenance' => 'CMaintenance',
-                'map' => 'CMap',
-                'mediatype' => 'CMediatype',
-                'proxy' => 'CProxy',
-                'service' => 'CService',
-                'screen' => 'CScreen',
-                'screenitem' => 'CScreenItem',
-                'script' => 'CScript',
-                'template' => 'CTemplate',
-                'templatescreen' => 'CTemplateScreen',
-                'templatescreenitem' => 'CTemplateScreenItem',
-                'trigger' => 'CTrigger',
-                'triggerprototype' => 'CTriggerPrototype',
-                'user' => 'CUser',
-                'usergroup' => 'CUserGroup',
-                'usermacro' => 'CUserMacro',
-                'usermedia' => 'CUserMedia',
-                'httptest' => 'CHttpTest',
-                'webcheck' => 'CHttpTest'
-            );
+            public function getClassMap()
+            {
+                $classMap = $this->objects;
+                return $classMap;
+            }
+        }
+    } 
+    else
+    {
+        require PATH_ZABBIX.'/include/classes/api/CZBXAPI.php';
+        class ZabbixApiClassMap extends API
+        {
+            public function getClassMap()
+            {
+                return self::$classMap;
+            }
         }
     }
 
@@ -188,11 +158,11 @@
     // initialze API array
     $apiArray = array();
 
-    // load CZBXAPI class
-    require PATH_ZABBIX_CZBXAPI_CLASS_FILE;
+    // Create new instance for API class map.
+    $apiClassMap = new ZabbixApiClassMap();
 
     // loop through class map
-    foreach(API_extended::getClassMap() as $resource => $class)
+    foreach($apiClassMap->getClassMap() as $resource => $class)
     {
         // add resource to API array
         $apiArray[$resource] = array();
