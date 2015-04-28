@@ -35,20 +35,6 @@ my_application
     └── ZabbixApi.class.php
 ```
 
-### Class inheritance
-
-By default there are only 2 classes defined:
-
-```
-ZabbixApiAbstract
-└── ZabbixApi
-```
-
-If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.  
-Out of the box, the `ZabbixApi` class is an empty class inherited from `ZabbixApiAbstract`.
-
-By customizing only `ZabbixApi`, you're able to update `ZabbixApiAbstract` (the build) at any time, without merging your customizations manually.
-
 ### Naming concept
 
 To translate a Zabbix™ API call into a PHP method call, you can simply
@@ -63,6 +49,20 @@ Internally we're using the following PHP scripting guidelines:
 * class names are `UpperCamelCase` (i.e. `ZabbixApi`)
 * method names are `lowerCamelCase` (i.e. `getApiUrl()`)
 * variables are `lowerCamelCase` (i.e. `$apiUrl`)
+
+### Class inheritance
+
+By default there are only 2 classes defined:
+
+```
+ZabbixApiAbstract
+└── ZabbixApi
+```
+
+If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.  
+Out of the box, the `ZabbixApi` class is an empty class inherited from `ZabbixApiAbstract`.
+
+By customizing only `ZabbixApi`, you're able to update `ZabbixApiAbstract` (the build) at any time, without merging your customizations manually.
 
 ### Basic usage
 
@@ -89,8 +89,6 @@ try {
 }
 ?>
 ```
-
-
 
 ## Examples
 
