@@ -6,14 +6,14 @@ PhpZabbixApi is an open-source PHP class library to communicate with the Zabbix�
 
 The Zabbix™ 2.0 PHP front-end is written in PHP, therefore we're able to build the PHP library directly from the origin Zabbix™ 2.0 PHP front-end source code / files.
 
-If you want to build your own library, have a look at the configuration file `inc/config.inc.php`. 
+If you want to build your own library, have a look at the configuration file `inc/config.inc.php`.  
 You might want to point `PATH_ZABBIX`  to your Zabbix™ installation directory.
 
 There are also pre-built libraries available in the `build/` directory, if you don't want to build it yourself.
 
 ## Using
 
-Build your own library or download the pre-built libraries from the `build/` directory.
+Build your own library or download the pre-built libraries from the `build/` directory.  
 Make sure the version of the build matches the Zabbix™ PHP front-end version.
 
 ### Download
