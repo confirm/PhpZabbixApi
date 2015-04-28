@@ -212,7 +212,7 @@ abstract class <CLASSNAME_ABSTRACT>
                 'jsonrpc' => '2.0',
                 'method'  => $method,
                 'params'  => $params,
-                'auth'    => ($auth ? $this->auth : ''),
+                'auth'    => ($this->auth ? $this->auth : NULL),
                 'id'      => $this->id
             );
         }
