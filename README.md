@@ -93,3 +93,5 @@ catch(Exception $e)
 ## Examples
 
 *coming soon*
+
+Please see also [the old project page](http://zabbixapi.confirm.ch/) for more examples.
