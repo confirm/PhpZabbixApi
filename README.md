@@ -42,15 +42,18 @@ To translate a Zabbix™ API call into a PHP method call, you can simply
 1. remove the dot
 2. capitalize the first letter of the action
 
-So we go from `host.massUpdate` (Zabbix™ API) to `hostMassUpdate()` (PHP API)
+Example:
 
-Internally we're using the following PHP scripting guidelines:
+```
+Zabbix™ API         PHP API
+-----------         -------
 
-* class names are `UpperCamelCase` (i.e. `ZabbixApi`)
-* method names are `lowerCamelCase` (i.e. `getApiUrl()`)
-* variables are `lowerCamelCase` (i.e. `$apiUrl`)
+graph.get           graphGet()
+host.massUpdate     hostMassUpdate()
+dcheck.isWritable   dcheckIsWritable()
+```
 
-### Class inheritance
+### Customizing the API class
 
 By default there are only 2 classes defined:
 
@@ -60,7 +63,7 @@ ZabbixApiAbstract
 ```
 
 If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.  
-Out of the box, the `ZabbixApi` class is an empty class inherited from `ZabbixApiAbstract`.
+Out of the box, `ZabbixApi` is an empty class inherited from `ZabbixApiAbstract`.
 
 By customizing only `ZabbixApi`, you're able to update `ZabbixApiAbstract` (the build) at any time, without merging your customizations manually.
 
