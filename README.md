@@ -47,7 +47,6 @@ Example:
 ```
 Zabbix™ API         PHP API
 -----------         -------
-
 graph.get           graphGet()
 host.massUpdate     hostMassUpdate()
 dcheck.isWritable   dcheckIsWritable()
@@ -73,22 +72,20 @@ To use the PhpZabbixApi you just have to load `ZabbixApi.class.php` and you're r
 
 ```php
 <?php
-
 // load ZabbixApi
 require_once 'lib/ZabbixApi.class.php';
 
-try {
-
+try 
+{
     // connect to Zabbix API
     $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix', 'admin');
     
-    // do your stuff here
-
-} catch(Exception $e) {
-
+    /* ... do your stuff here ... */
+} 
+catch(Exception $e) 
+{
     // Exception in ZabbixApi catched
     echo $e->getMessage();
-
 }
 ?>
 ```
