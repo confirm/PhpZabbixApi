@@ -96,29 +96,69 @@ Please see also [the old project page](http://zabbixapi.confirm.ch/) for more ex
 
 ### Simple request
 
+Here's a simple request to fetch all defined graphs via [graph.get API method](https://www.zabbix.com/documentation/2.4/manual/api/reference/graph/get):
+
 ```php
-<?php
-
-// load ZabbixApi
-require 'ZabbixApi.class.php';
-
-try
-{
-    // connect to Zabbix API
-    $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix', 'admin');
-
     // get all graphs
     $graphs = $api->graphGet();
 
     // print all graph IDs
     foreach($graphs as $graph)
         echo $graph->graphid."\n";
-} 
-catch(Exception $e) 
-{
-    // Exception in ZabbixApi catched
-    echo $e->getMessage();
-}
-?>
 ```
 
+### Request with parameters
+
+Most of the time you want to define some specific parameters.  
+Here's an example to fetch all CPU graphs via [graph.get API method](https://www.zabbix.com/documentation/2.4/manual/api/reference/graph/get):
+
+```php
+    // get all graphs named "CPU"
+    $cpuGraphs = $api->graphGet(array(
+        'output' => 'extend',
+        'search' => array('name' => 'CPU')
+    ));
+
+    // print graph ID with graph name
+    foreach($cpuGraphs as $graph)
+        printf("id:%d name:%s\n", $graph->graphid, $graph->name);
+```
+
+### Define default parameters
+
+Sometimes you want to define default parameters, which will be included in each API request.
+You can do that by defining the parameters in an array via `setDefaultParams()`:
+
+```php
+    // use extended output for all further requests
+    $api->setDefaultParams(array(
+        'output' => 'extend'
+    ));
+
+    // get all graphs named "CPU"
+    $cpuGraphs = $api->graphGet(array(
+        'search' => array('name' => 'CPU')
+    ));
+
+    // print graph ID with graph name
+    foreach($cpuGraphs as $graph)
+        printf("id:%d name:%s\n", $graph->graphid, $graph->name);
+```
+
+### Get associative / un-indexed array
+
+By default all API responses will be returned in an indexed array.  
+But sometimes you want to get an associative array with the ID or name of the fetched element.
+
+So here's an example to fetch all graphs in an associative array with the graph's `name` as array key:
+
+```php
+    // get all graphs in an associative array (key=name)
+    $graphs = $api->graphGet(array(), 'name');
+
+    // print graph ID with graph name
+    if(array_key_exists('CPU Load Zabbix Server', $graphs))
+        echo 'CPU Load graph exists';
+    else
+        echo 'Could not find CPU Load graph';
+```
