@@ -147,9 +147,9 @@ You can do that by defining the parameters in an array via `setDefaultParams()`:
 
 ### Get associative / un-indexed array
 
-By default all API responses will be returned in an indexed array.
-If you then looking for a specific named graph, you've to loop through the indexed array and compare the `name` attribute of each element. Because of that, there's a simple way to to get an associative instead of an indexed array. 
-You just have to define the 2nd parameter of the API method, which is the name of attribute you'd like to use as an array key.
+By default all API responses will be returned in an indexed array.  
+So if you then looking for a specific named graph, you've to loop through the indexed array and compare the `name` attribute of each element.  
+This can be a bit of a pain, and because of that, there's a simple way to to get an associative instead of an indexed array. You just have to define the 2nd parameter of the API method, which is the name of attribute you'd like to use as an array key.
 
 Here's an example to fetch all graphs in an associative array, with the graph's `name` as array key:
 
