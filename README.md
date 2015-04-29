@@ -68,7 +68,7 @@ By customizing only `ZabbixApi`, you're able to update `ZabbixApiAbstract` (the 
 
 ### Basic usage
 
-To use the PhpZabbixApi you just have to load `ZabbixApi.class.php` and you're ready to go:
+To use the PhpZabbixApi you just have to load `ZabbixApi.class.php`, create a new `ZabbixApi` instance, and you're ready to go:
 
 ```php
 <?php
@@ -93,5 +93,32 @@ catch(Exception $e)
 ## Examples
 
 Please see also [the old project page](http://zabbixapi.confirm.ch/) for more examples.  
-**The examples will be moved to github soon.**
+
+### Simple request
+
+```php
+<?php
+
+// load ZabbixApi
+require 'ZabbixApi.class.php';
+
+try
+{
+    // connect to Zabbix API
+    $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix', 'admin');
+
+    // get all graphs
+    $graphs = $api->graphGet();
+
+    // print all graph IDs
+    foreach($graphs as $graph)
+        echo $graph->graphid."\n";
+} 
+catch(Exception $e) 
+{
+    // Exception in ZabbixApi catched
+    echo $e->getMessage();
+}
+?>
+```
 
