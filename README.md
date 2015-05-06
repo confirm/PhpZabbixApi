@@ -1,19 +1,25 @@
 ## PhpZabbixApi
 
+### About
+
 PhpZabbixApi is an open-source PHP class library to communicate with the Zabbix™ JSON-RPC API.
 
 Because PhpZabbixApi is generated directly from the origin Zabbix™ 2.0 PHP front-end source code / files, each real Zabbix™ JSON-RPC API method is implemented (hard-coded) directly as an own PHP method. This means PhpZabbixApi is IDE-friendly, because you've a PHP method for each API method, and there are no PHP magic functions or alike.
 
+### License
+
+PhpZabbixApi is licensed under the MIT license.
+
 ## Building
 
-If you want to build your own library, have a look at the configuration file `inc/config.inc.php`.  
+If you want to build your own library, have a look at the configuration file `inc/config.inc.php`.
 You might want to point `PATH_ZABBIX`  to your Zabbix™ installation directory.
 
 There are also pre-built libraries available in the `build/` directory, if you don't want to build it yourself.
 
 ## Using
 
-Build your own library or download the pre-built libraries from the `build/` directory.  
+Build your own library or download the pre-built libraries from the `build/` directory.
 Make sure the version of the build matches the Zabbix™ PHP front-end version.
 
 ### Download
@@ -22,7 +28,7 @@ Make sure the version of the build matches the Zabbix™ PHP front-end version.
 
 Make sure you've downloaded the following files and stored them in the same directory:
 
-* `ZabbixApi.class.php` 
+* `ZabbixApi.class.php`
 * `ZabbixApiAbstract.class.php`
 
 For example:
@@ -61,7 +67,7 @@ ZabbixApiAbstract
 └── ZabbixApi
 ```
 
-If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.  
+If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.
 Out of the box, `ZabbixApi` is an empty class inherited from `ZabbixApiAbstract`.
 
 By customizing only `ZabbixApi`, you're able to update `ZabbixApiAbstract` (the build) at any time, without merging your customizations manually.
@@ -75,14 +81,14 @@ To use the PhpZabbixApi you just have to load `ZabbixApi.class.php`, create a ne
 // load ZabbixApi
 require_once 'lib/ZabbixApi.class.php';
 
-try 
+try
 {
     // connect to Zabbix API
     $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix', 'admin');
-    
+
     /* ... do your stuff here ... */
-} 
-catch(Exception $e) 
+}
+catch(Exception $e)
 {
     // Exception in ZabbixApi catched
     echo $e->getMessage();
@@ -92,7 +98,7 @@ catch(Exception $e)
 
 ## Examples
 
-Please see also [the old project page](http://zabbixapi.confirm.ch/) for more examples.  
+Please see also [the old project page](http://zabbixapi.confirm.ch/) for more examples.
 
 ### Simple request
 
@@ -109,7 +115,7 @@ Here's a simple request to fetch all defined graphs via [graph.get API method](h
 
 ### Request with parameters
 
-Most of the time you want to define some specific parameters.  
+Most of the time you want to define some specific parameters.
 Here's an example to fetch all CPU graphs via [graph.get API method](https://www.zabbix.com/documentation/2.4/manual/api/reference/graph/get):
 
 ```php

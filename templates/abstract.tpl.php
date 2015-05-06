@@ -427,16 +427,16 @@ abstract class <CLASSNAME_ABSTRACT>
      * @brief   Reqeusts the Zabbix API and returns the response of the API
      *          method <API_METHOD>.
      *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
+     * The $params Array can be used, to pass parameters to the Zabbix API.
+     * For more informations about these parameters, check the Zabbix API
+     * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
+     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * indexed array as response. A valid value for the $arrayKeyProperty is
+     * is any property of the returned JSON objects (e.g. name, host,
+     * hostid, graphid, screenitemid).
      *
-     * @param   $params             Parameters to pass through.
+     * @param   $params             Zabbix API parameters.
      * @param   $arrayKeyProperty   Object property for key of array.
      *
      * @retval  stdClass
