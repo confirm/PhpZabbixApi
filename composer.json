@@ -1,9 +1,9 @@
 {
-    "name": "php-zabbix-api/php-zabbix-api-22",
+    "name": "php-zabbix-api/php-zabbix-api",
     "type": "library",
     "description": "PhpZabbixApi library",
     "keywords": ["zabbix","api"],
-    "homepage": "http://github.com/domibarton/PhpZabbixApi/build/2.2",
+    "homepage": "http://github.com/domibarton/PhpZabbixApi",
     "license": "MIT",
     "authors": [
     ],
@@ -12,7 +12,7 @@
     },
     "autoload": {
         "psr-0": {
-            "ZabbixApi": "src"
+            "ZabbixApi": "build"
         }
     }
 }
