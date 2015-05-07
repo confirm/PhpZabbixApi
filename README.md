@@ -118,7 +118,7 @@ try
 
     /* ... do your stuff here ... */
 }
-catch(Exception $e)
+catch(\Exception $e)
 {
     // Exception in ZabbixApi catched
     echo $e->getMessage();
