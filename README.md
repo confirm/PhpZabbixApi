@@ -64,8 +64,8 @@ All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be in
 
 
 ```
-composer require php-zabbix-api/php-zabbix-api:v2.2
-composer require php-zabbix-api/php-zabbix-api:v2.4
+composer require php-zabbix-api/php-zabbix-api:v2.2.0
+composer require php-zabbix-api/php-zabbix-api:v2.4.0
 ```
 
 ## Using the thing
