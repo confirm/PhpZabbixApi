@@ -175,7 +175,7 @@ abstract class ZabbixApiAbstract
         if(is_array($defaultParams))
             $this->defaultParams = $defaultParams;
         else
-            throw new Exception('The argument defaultParams on setDefaultParams() has to be an array.');
+            throw new \Exception('The argument defaultParams on setDefaultParams() has to be an array.');
 
         return $this;
     }
@@ -252,7 +252,7 @@ abstract class ZabbixApiAbstract
         // get file handler
         $fileHandler = fopen($this->getApiUrl(), 'rb', false, $streamContext);
         if(!$fileHandler)
-            throw new Exception('Could not connect to "'.$this->getApiUrl().'"');
+            throw new \Exception('Could not connect to "'.$this->getApiUrl().'"');
 
         // get response
         $this->response = @stream_get_contents($fileHandler);
@@ -263,16 +263,16 @@ abstract class ZabbixApiAbstract
 
         // response verification
         if($this->response === FALSE)
-            throw new Exception('Could not read data from "'.$this->getApiUrl().'"');
+            throw new \Exception('Could not read data from "'.$this->getApiUrl().'"');
 
         // decode response
         $this->responseDecoded = json_decode($this->response);
 
         // validate response
         if(!is_object($this->responseDecoded) && !is_array($this->responseDecoded))
-            throw new Exception('Could not decode JSON response.');
+            throw new \Exception('Could not decode JSON response.');
         if(array_key_exists('error', $this->responseDecoded))
-            throw new Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);
+            throw new \Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);
 
         // return response
         if($resultArrayKey && is_array($this->responseDecoded->result))
