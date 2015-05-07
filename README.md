@@ -109,6 +109,7 @@ To use the PhpZabbixApi you just have to load `ZabbixApi.class.php`, create a ne
 <?php
 // load ZabbixApi
 require_once 'lib/ZabbixApi.class.php';
+use ZabbixApi\ZabbixApi;
 
 try
 {
