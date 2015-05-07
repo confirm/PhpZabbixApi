@@ -15,16 +15,27 @@ PhpZabbixApi is licensed under the MIT license.
 If you want to build your own library, have a look at the configuration file `inc/config.inc.php`.
 You might want to point `PATH_ZABBIX`  to your Zabbix™ installation directory.
 
+If you setup everything correctly, you should be able to create the library by executing:
+
+```bash
+php build.php
+```
+
 There are also pre-built libraries available in the `build/` directory, if you don't want to build it yourself.
 
 ## Using
 
-Build your own library or download the pre-built libraries from the `build/` directory.
-Make sure the version of the build matches the Zabbix™ PHP front-end version.
+You can get PhpZabbixApi in 3 different ways:
+
+* [building](#building) it yourself
+* download a pre-built library [release](https://github.com/domibarton/PhpZabbixApi/releases)
+* using PHP composer / [Packagist](https://packagist.org/)
+
+Make sure the version of the library matches the Zabbix™ PHP front-end / API version.
 
 ### Download
 
-[Download](https://github.com/domibarton/PhpZabbixApi/tree/master/build)  pre-built PHP class library files directly from gitub (`build/` directory).
+[Download a release](https://github.com/domibarton/PhpZabbixApi/releases) and extract the pre-built PHP library from the `build/` directory.
 
 Make sure you've downloaded the following files and stored them in the same directory:
 
@@ -39,6 +50,22 @@ my_application
 └── lib
     ├── ZabbixApiAbstract.class.php
     └── ZabbixApi.class.php
+```
+
+### Composer
+
+If you're using PHP composer, you can load the library directly via:
+
+```
+composer require php-zabbix-api/php-zabbix-api:<version>
+```
+
+All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be installed, for example:
+
+
+```
+composer require php-zabbix-api/php-zabbix-api:v2.2
+composer require php-zabbix-api/php-zabbix-api:v2.4
 ```
 
 ### Naming concept
