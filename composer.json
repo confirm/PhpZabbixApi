@@ -1,5 +1,5 @@
 {
-    "name": "php-zabbix-api/php-zabbix-api",
+    "name": "confirm-it-solutions/php-zabbix-api",
     "type": "library",
     "description": "PhpZabbixApi library",
     "keywords": ["zabbix","api"],
