@@ -6,10 +6,12 @@
     "homepage": "http://github.com/confirm-it-solutions/PhpZabbixApi",
     "license": "MIT",
     "authors": [
-        "name": "Dominique Barton",
-        "email": "dbarton@confirm.ch",
-        "homepage": "http://www.confirm.ch",
-        "role": "Developer"
+        {
+            "name": "Dominique Barton",
+            "email": "dbarton@confirm.ch",
+            "homepage": "http://www.confirm.ch",
+            "role": "Developer"
+        }
     ],
     "require": {
         "php": ">=5.3.0"
