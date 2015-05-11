@@ -57,15 +57,15 @@ my_application
 If you're using PHP composer, you can load the library directly via:
 
 ```
-composer require php-zabbix-api/php-zabbix-api:<version>
+composer require confirm-it-solutions/php-zabbix-api:<version>
 ```
 
 All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be installed, for example:
 
 
 ```
-composer require php-zabbix-api/php-zabbix-api:v2.2.0
-composer require php-zabbix-api/php-zabbix-api:v2.4.0
+composer require confirm-it-solutions/php-zabbix-api:v2.2.0
+composer require confirm-it-solutions/php-zabbix-api:v2.4.0
 ```
 
 ## Using the thing
