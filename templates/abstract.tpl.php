@@ -45,6 +45,14 @@
 namespace ZabbixApi;
 
 /**
+ * @brief   Exception class for ZabbixApi namespace.
+ */
+
+class Exception extends \Exception
+{
+}
+
+/**
  * @brief   Abstract class for the Zabbix API.
  */
 
@@ -186,7 +194,7 @@ abstract class <CLASSNAME_ABSTRACT>
         if(is_array($defaultParams))
             $this->defaultParams = $defaultParams;
         else
-            throw new \Exception('The argument defaultParams on setDefaultParams() has to be an array.');
+            throw new Exception('The argument defaultParams on setDefaultParams() has to be an array.');
 
         return $this;
     }
@@ -263,7 +271,7 @@ abstract class <CLASSNAME_ABSTRACT>
         // get file handler
         $fileHandler = fopen($this->getApiUrl(), 'rb', false, $streamContext);
         if(!$fileHandler)
-            throw new \Exception('Could not connect to "'.$this->getApiUrl().'"');
+            throw new Exception('Could not connect to "'.$this->getApiUrl().'"');
 
         // get response
         $this->response = @stream_get_contents($fileHandler);
@@ -274,16 +282,16 @@ abstract class <CLASSNAME_ABSTRACT>
 
         // response verification
         if($this->response === FALSE)
-            throw new \Exception('Could not read data from "'.$this->getApiUrl().'"');
+            throw new Exception('Could not read data from "'.$this->getApiUrl().'"');
 
         // decode response
         $this->responseDecoded = json_decode($this->response);
 
         // validate response
         if(!is_object($this->responseDecoded) && !is_array($this->responseDecoded))
-            throw new \Exception('Could not decode JSON response.');
+            throw new Exception('Could not decode JSON response.');
         if(array_key_exists('error', $this->responseDecoded))
-            throw new \Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);
+            throw new Exception('API error '.$this->responseDecoded->error->code.': '.$this->responseDecoded->error->data);
 
         // return response
         if($resultArrayKey && is_array($this->responseDecoded->result))
@@ -352,7 +360,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * Afterwards the array will be merged with all default params, while the
      * default params have a lower priority (passed array will overwrite default
-     * params). But there is an exception for merging: If the passed array is an
+     * params). But there is an Exception for merging: If the passed array is an
      * indexed array, the default params will not be merged. This is because
      * there are some API methods, which are expecting a simple JSON array (aka
      * PHP indexed array) instead of an object (aka PHP associative array).
@@ -386,29 +394,75 @@ abstract class <CLASSNAME_ABSTRACT>
      * @brief   Login into the API.
      *
      * This will also retreive the auth Token, which will be used for any
-     * further requests.
+     * further requests. Please be aware that by default the received auth
+     * token will be cached on the filesystem.
      *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
+     * When a user is successfully logged in for the first time, the token will
+     * be cached / stored in the $tokenCacheDir directory. For every future
+     * request, the cached auth token will automatically be loaded and the
+     * user.login is skipped. If the auth token is invalid/expired, user.login
+     * will be executed, and the auth token will be cached again.
      *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
+     * The $params Array can be used, to pass parameters to the Zabbix API.
+     * For more informations about these parameters, check the Zabbix API
+     * documentation at https://www.zabbix.com/documentation/.
+     *
+     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * indexed array as response. A valid value for the $arrayKeyProperty is
+     * is any property of the returned JSON objects (e.g. name, host,
+     * hostid, graphid, screenitemid).
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
+     * @param   $tokenCacheDir      Path to a directory to store the auth token.
      *
      * @retval  stdClass
      *
      * @throws  Exception
      */
 
-    final public function userLogin($params=array(), $arrayKeyProperty='')
+    final public function userLogin($params=array(), $arrayKeyProperty='', $tokenCacheDir='/tmp')
     {
-        $params = $this->getRequestParamsArray($params);
-        $this->auth = $this->request('user.login', $params, $arrayKeyProperty, FALSE);
+        // reset auth token
+        $this->auth = '';
+
+        // build filename for cached auth token
+        if($tokenCacheDir && array_key_exists('user', $params) && is_dir($tokenCacheDir))
+            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user']);
+
+        // try to read cached auth token
+        if(isset($tokenCacheFile) && is_file($tokenCacheFile))
+        {
+            try
+            {
+                // get auth token and try to execute a user.get (dummy check)
+                $this->auth = file_get_contents($tokenCacheFile);
+                $this->userGet();
+            }
+            catch(Exception $e)
+            {
+                // user.get failed, token invalid so reset it and remove file
+                $this->auth = '';
+                unlink($tokenCacheFile);
+            }
+        }
+
+        // no cached token found so far, so login (again)
+        if(!$this->auth)
+        {
+            // login to get the auth token
+            $params = $this->getRequestParamsArray($params);
+            $this->auth = $this->request('user.login', $params, $arrayKeyProperty, FALSE);
+
+            // save cached auth token
+            if(isset($tokenCacheFile))
+            {
+                file_put_contents($tokenCacheFile, $this->auth);
+                chmod($tokenCacheFile, 0600);
+            }
+        }
+
+
         return $this->auth;
     }
 
@@ -417,14 +471,14 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * This will also reset the auth Token.
      *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
+     * The $params Array can be used, to pass parameters to the Zabbix API.
+     * For more informations about these parameters, check the Zabbix API
+     * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
+     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * indexed array as response. A valid value for the $arrayKeyProperty is
+     * is any property of the returned JSON objects (e.g. name, host,
+     * hostid, graphid, screenitemid).
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
