@@ -106,20 +106,31 @@ abstract class <CLASSNAME_ABSTRACT>
     private $responseDecoded = NULL;
 
     /**
-     * @brief   Class constructor.
-     *
-     * @param   $apiUrl     API url (e.g. http://FQDN/zabbix/api_jsonrpc.php)
-     * @param   $user       Username.
-     * @param   $password   Password.
+     * @brief   Extra HTTP headers.
      */
 
-    public function __construct($apiUrl='', $user='', $password='')
+    private $extraHeaders = '';
+
+    /**
+     * @brief   Class constructor.
+     *
+     * @param   $apiUrl         API url (e.g. http://FQDN/zabbix/api_jsonrpc.php)
+     * @param   $user           Username for Zabbix API.
+     * @param   $password       Password for Zabbix API.
+     * @param   $httpUser       Username for HTTP basic authorization.
+     * @param   $httpPassword   Password for HTTP basic authorization.
+     */
+
+    public function __construct($apiUrl='', $user='', $password='', $httpUser='', $httpPassword='')
     {
         if($apiUrl)
             $this->setApiUrl($apiUrl);
 
         if($user && $password)
             $this->userLogin(array('user' => $user, 'password' => $password));
+
+        if ($httpUser && $httpPassword)
+            $this->extraHeaders = 'Authorization: Basic ' . base64_encode($httpUser.':'.$httpPassword);
     }
 
     /**
@@ -245,7 +256,7 @@ abstract class <CLASSNAME_ABSTRACT>
         // do request
         $streamContext = stream_context_create(array('http' => array(
             'method'  => 'POST',
-            'header'  => 'Content-type: application/json-rpc'."\r\n",
+            'header'  => 'Content-type: application/json-rpc'."\r\n".$this->extraHeaders,
             'content' => $this->requestEncoded
         )));
 
