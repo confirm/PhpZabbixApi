@@ -388,27 +388,63 @@ abstract class <CLASSNAME_ABSTRACT>
      * This will also retreive the auth Token, which will be used for any
      * further requests.
      *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
+     * The $params Array can be used, to pass parameters to the Zabbix API.
+     * For more informations about these parameters, check the Zabbix API
+     * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
+     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * indexed array as response. A valid value for the $arrayKeyProperty is
+     * is any property of the returned JSON objects (e.g. name, host,
+     * hostid, graphid, screenitemid).
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
+     * @param   $tokenCacheDir      Path to a directory to store / cache login tokens.
      *
      * @retval  stdClass
      *
      * @throws  Exception
      */
 
-    final public function userLogin($params=array(), $arrayKeyProperty='')
+    final public function userLogin($params=array(), $arrayKeyProperty='', $tokenCacheDir='/tmp')
     {
-        $params = $this->getRequestParamsArray($params);
-        $this->auth = $this->request('user.login', $params, $arrayKeyProperty, FALSE);
+        // reset auth token
+        $this->auth = '';
+
+        // build filename for cached auth token
+        if($tokenCacheDir && array_key_exists('user', $params) && is_dir($tokenCacheDir))
+            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.$params['user'];
+
+        // try to read cached auth token
+        if(isset($tokenCacheFile) && is_file($tokenCacheFile))
+        {
+            try
+            {
+                // get auth token and try to execute a user.get (dummy check)
+                $this->auth = file_get_contents($tokenCacheFile);
+                $this->userGet();
+            }
+            catch(\Exception as $e)
+            {
+                // user.get failed, token invalid so reset it and remove file
+                $this->auth = '';
+                unlink($tokenCacheFile);
+            }
+        }
+
+        // no cached token found so far, so login (again)
+        if(!$this->auth)
+        {
+            // login to get the auth token
+            $params = $this->getRequestParamsArray($params);
+            $this->auth = $this->request('user.login', $params, $arrayKeyProperty, FALSE);
+
+            // save cached auth token
+            if(isset($tokenCacheFile))
+                file_put_contents($tokenCacheFile, $this->auth);
+        }
+
+
         return $this->auth;
     }
 
@@ -417,14 +453,14 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * This will also reset the auth Token.
      *
-     * The $params Array can be used, to pass through params to the Zabbix API.
-     * For more informations about this params, check the Zabbix API
-     * Documentation.
+     * The $params Array can be used, to pass parameters to the Zabbix API.
+     * For more informations about these parameters, check the Zabbix API
+     * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty is "PHP-internal" and can be used, to get an
-     * associatve instead of an indexed array as response. A valid value for
-     * this $arrayKeyProperty is any property of the returned JSON objects
-     * (e.g. name, host, hostid, graphid, screenitemid).
+     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * indexed array as response. A valid value for the $arrayKeyProperty is
+     * is any property of the returned JSON objects (e.g. name, host,
+     * hostid, graphid, screenitemid).
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
