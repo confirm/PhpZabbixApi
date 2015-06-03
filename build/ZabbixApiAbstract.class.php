@@ -142,11 +142,11 @@ abstract class ZabbixApiAbstract
         if($apiUrl)
             $this->setApiUrl($apiUrl);
 
+        if ($httpUser && $httpPassword)
+            $this->setBasicAuthorization($httpUser, $httpPassword);
+
         if($user && $password)
             $this->userLogin(array('user' => $user, 'password' => $password));
-
-        if ($httpUser && $httpPassword)
-            $this->extraHeaders = 'Authorization: Basic ' . base64_encode($httpUser.':'.$httpPassword);
     }
 
     /**
@@ -160,7 +160,6 @@ abstract class ZabbixApiAbstract
         return $this->apiUrl;
     }
 
-
     /**
      * @brief   Sets the API url for all requests.
      *
@@ -172,6 +171,25 @@ abstract class ZabbixApiAbstract
     public function setApiUrl($apiUrl)
     {
         $this->apiUrl = $apiUrl;
+        return $this;
+    }
+
+    /**
+     * @brief   Sets the username and password for the HTTP basic authorization.
+     *
+     * @param   $user       HTTP basic authorization username
+     * @param   $password   HTTP basic authorization password
+     *
+     * @retval  ZabbixApiAbstract
+     */
+
+    public function setBasicAuthorization($user, $password)
+    {
+        if($user && $password)
+            $this->extraHeaders = 'Authorization: Basic ' . base64_encode($user.':'.$password);
+        else
+            $this->extraHeaders = '';
+
         return $this;
     }
 
@@ -277,7 +295,7 @@ abstract class ZabbixApiAbstract
         )));
 
         // get file handler
-        $fileHandler = fopen($this->getApiUrl(), 'rb', false, $streamContext);
+        $fileHandler = @fopen($this->getApiUrl(), 'rb', false, $streamContext);
         if(!$fileHandler)
             throw new Exception('Could not connect to "'.$this->getApiUrl().'"');
 
