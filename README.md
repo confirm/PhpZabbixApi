@@ -64,8 +64,15 @@ All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be in
 
 
 ```
-composer require confirm-it-solutions/php-zabbix-api:v2.2.0
-composer require confirm-it-solutions/php-zabbix-api:v2.4.0
+composer require 'confirm-it-solutions/php-zabbix-api:2.2.2'
+composer require 'confirm-it-solutions/php-zabbix-api:2.4.2'
+```
+
+If you're looking for more "bleeding-edge" versions (e.g. for testing), then you could also use [branches](https://github.com/confirm-it-solutions/PhpZabbixApi/branches):
+
+```
+composer require 'confirm-it-solutions/php-zabbix-api:2.2.*@dev'
+composer require 'confirm-it-solutions/php-zabbix-api:2.4.*@dev'
 ```
 
 ## Using the thing
