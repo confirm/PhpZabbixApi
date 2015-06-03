@@ -114,7 +114,7 @@ use ZabbixApi\ZabbixApi;
 try
 {
     // connect to Zabbix API
-    $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix', 'admin');
+    $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix_user', 'zabbix_password');
 
     /* ... do your stuff here ... */
 }
@@ -124,6 +124,13 @@ catch(Exception $e)
     echo $e->getMessage();
 }
 ?>
+```
+
+The API can also work with __HTTP Basic Authroization__, you just have to call the constructor with additional parameters:
+
+```php
+// connect to Zabbix API with HTTP basic auth
+$api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix_user', 'zabbix_password', 'http_user', 'http_password');
 ```
 
 ## Examples
