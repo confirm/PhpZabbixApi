@@ -60,6 +60,14 @@ abstract class <CLASSNAME_ABSTRACT>
 {
 
     /**
+     * @brief   Anonymous API functions.
+     */
+
+    static private $anonymousFunctions = array(
+        'apiinfo.version'
+    );
+
+    /**
      * @brief   Boolean if requests/responses should be printed out (JSON).
      */
 
@@ -462,7 +470,6 @@ abstract class <CLASSNAME_ABSTRACT>
             }
         }
 
-
         return $this->auth;
     }
 
@@ -523,8 +530,11 @@ abstract class <CLASSNAME_ABSTRACT>
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('<API_METHOD>', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('<API_METHOD>', $params, $arrayKeyProperty);
+        return $this->request('<API_METHOD>', $params, $arrayKeyProperty, $auth);
     }
     <!END_API_METHOD>
 
