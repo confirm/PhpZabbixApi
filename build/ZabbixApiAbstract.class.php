@@ -60,6 +60,14 @@ abstract class ZabbixApiAbstract
 {
 
     /**
+     * @brief   Anonymous API functions.
+     */
+
+    static private $anonymousFunctions = array(
+        'apiinfo.version'
+    );
+
+    /**
      * @brief   Boolean if requests/responses should be printed out (JSON).
      */
 
@@ -462,7 +470,6 @@ abstract class ZabbixApiAbstract
             }
         }
 
-
         return $this->auth;
     }
 
@@ -523,8 +530,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.get', $params, $arrayKeyProperty);
+        return $this->request('action.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -553,8 +563,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.exists', $params, $arrayKeyProperty);
+        return $this->request('action.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -583,8 +596,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.create', $params, $arrayKeyProperty);
+        return $this->request('action.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -613,8 +629,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.update', $params, $arrayKeyProperty);
+        return $this->request('action.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -643,8 +662,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.delete', $params, $arrayKeyProperty);
+        return $this->request('action.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -673,8 +695,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.validateOperations', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.validateOperations', $params, $arrayKeyProperty);
+        return $this->request('action.validateOperations', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -703,8 +728,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.validateConditions', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.validateConditions', $params, $arrayKeyProperty);
+        return $this->request('action.validateConditions', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -733,8 +761,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('action.validateOperationConditions', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('action.validateOperationConditions', $params, $arrayKeyProperty);
+        return $this->request('action.validateOperationConditions', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -763,8 +794,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('alert.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('alert.get', $params, $arrayKeyProperty);
+        return $this->request('alert.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -793,8 +827,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('apiinfo.version', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('apiinfo.version', $params, $arrayKeyProperty);
+        return $this->request('apiinfo.version', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -823,8 +860,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.get', $params, $arrayKeyProperty);
+        return $this->request('application.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -853,8 +893,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.exists', $params, $arrayKeyProperty);
+        return $this->request('application.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -883,8 +926,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.checkInput', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.checkInput', $params, $arrayKeyProperty);
+        return $this->request('application.checkInput', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -913,8 +959,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.create', $params, $arrayKeyProperty);
+        return $this->request('application.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -943,8 +992,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.update', $params, $arrayKeyProperty);
+        return $this->request('application.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -973,8 +1025,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.delete', $params, $arrayKeyProperty);
+        return $this->request('application.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1003,8 +1058,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('application.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('application.massAdd', $params, $arrayKeyProperty);
+        return $this->request('application.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1033,8 +1091,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('configuration.export', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('configuration.export', $params, $arrayKeyProperty);
+        return $this->request('configuration.export', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1063,8 +1124,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('configuration.import', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('configuration.import', $params, $arrayKeyProperty);
+        return $this->request('configuration.import', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1093,8 +1157,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dcheck.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dcheck.get', $params, $arrayKeyProperty);
+        return $this->request('dcheck.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1123,8 +1190,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dcheck.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dcheck.isReadable', $params, $arrayKeyProperty);
+        return $this->request('dcheck.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1153,8 +1223,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dcheck.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dcheck.isWritable', $params, $arrayKeyProperty);
+        return $this->request('dcheck.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1183,8 +1256,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dhost.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dhost.get', $params, $arrayKeyProperty);
+        return $this->request('dhost.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1213,8 +1289,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dhost.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dhost.exists', $params, $arrayKeyProperty);
+        return $this->request('dhost.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1243,8 +1322,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.get', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1273,8 +1355,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.exists', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1303,8 +1388,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.create', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1333,8 +1421,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.update', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1363,8 +1454,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.delete', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1393,8 +1487,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.copy', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.copy', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.copy', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1423,8 +1520,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1453,8 +1553,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.isReadable', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1483,8 +1586,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.isWritable', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1513,8 +1619,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('discoveryrule.findInterfaceForItem', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('discoveryrule.findInterfaceForItem', $params, $arrayKeyProperty);
+        return $this->request('discoveryrule.findInterfaceForItem', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1543,8 +1652,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.get', $params, $arrayKeyProperty);
+        return $this->request('drule.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1573,8 +1685,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.exists', $params, $arrayKeyProperty);
+        return $this->request('drule.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1603,8 +1718,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.checkInput', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.checkInput', $params, $arrayKeyProperty);
+        return $this->request('drule.checkInput', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1633,8 +1751,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.create', $params, $arrayKeyProperty);
+        return $this->request('drule.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1663,8 +1784,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.update', $params, $arrayKeyProperty);
+        return $this->request('drule.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1693,8 +1817,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.delete', $params, $arrayKeyProperty);
+        return $this->request('drule.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1723,8 +1850,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.isReadable', $params, $arrayKeyProperty);
+        return $this->request('drule.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1753,8 +1883,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('drule.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('drule.isWritable', $params, $arrayKeyProperty);
+        return $this->request('drule.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1783,8 +1916,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dservice.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dservice.get', $params, $arrayKeyProperty);
+        return $this->request('dservice.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1813,8 +1949,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('dservice.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('dservice.exists', $params, $arrayKeyProperty);
+        return $this->request('dservice.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1843,8 +1982,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('event.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('event.get', $params, $arrayKeyProperty);
+        return $this->request('event.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1873,8 +2015,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('event.acknowledge', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('event.acknowledge', $params, $arrayKeyProperty);
+        return $this->request('event.acknowledge', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1903,8 +2048,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.get', $params, $arrayKeyProperty);
+        return $this->request('graph.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1933,8 +2081,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('graph.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1963,8 +2114,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.delete', $params, $arrayKeyProperty);
+        return $this->request('graph.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -1993,8 +2147,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.update', $params, $arrayKeyProperty);
+        return $this->request('graph.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2023,8 +2180,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.create', $params, $arrayKeyProperty);
+        return $this->request('graph.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2053,8 +2213,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.exists', $params, $arrayKeyProperty);
+        return $this->request('graph.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2083,8 +2246,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graph.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graph.getObjects', $params, $arrayKeyProperty);
+        return $this->request('graph.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2113,8 +2279,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphitem.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphitem.get', $params, $arrayKeyProperty);
+        return $this->request('graphitem.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2143,8 +2312,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.get', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2173,8 +2345,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2203,8 +2378,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.delete', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2233,8 +2411,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.update', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2263,8 +2444,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.create', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2293,8 +2477,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.exists', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2323,8 +2510,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('graphprototype.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('graphprototype.getObjects', $params, $arrayKeyProperty);
+        return $this->request('graphprototype.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2353,8 +2543,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.get', $params, $arrayKeyProperty);
+        return $this->request('host.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2383,8 +2576,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.getObjects', $params, $arrayKeyProperty);
+        return $this->request('host.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2413,8 +2609,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.exists', $params, $arrayKeyProperty);
+        return $this->request('host.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2443,8 +2642,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.create', $params, $arrayKeyProperty);
+        return $this->request('host.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2473,8 +2675,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.update', $params, $arrayKeyProperty);
+        return $this->request('host.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2503,8 +2708,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.massAdd', $params, $arrayKeyProperty);
+        return $this->request('host.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2533,8 +2741,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.massUpdate', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.massUpdate', $params, $arrayKeyProperty);
+        return $this->request('host.massUpdate', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2563,8 +2774,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.massRemove', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.massRemove', $params, $arrayKeyProperty);
+        return $this->request('host.massRemove', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2593,8 +2807,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.delete', $params, $arrayKeyProperty);
+        return $this->request('host.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2623,8 +2840,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.isReadable', $params, $arrayKeyProperty);
+        return $this->request('host.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2653,8 +2873,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('host.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('host.isWritable', $params, $arrayKeyProperty);
+        return $this->request('host.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2683,8 +2906,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.get', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2713,8 +2939,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.getObjects', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2743,8 +2972,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.exists', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2773,8 +3005,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.create', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2803,8 +3038,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.update', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2833,8 +3071,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.delete', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2863,8 +3104,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.massAdd', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2893,8 +3137,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.massRemove', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.massRemove', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.massRemove', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2923,8 +3170,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.massUpdate', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.massUpdate', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.massUpdate', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2953,8 +3203,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.isReadable', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -2983,8 +3236,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostgroup.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostgroup.isWritable', $params, $arrayKeyProperty);
+        return $this->request('hostgroup.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3013,8 +3269,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.get', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3043,8 +3302,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.create', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3073,8 +3335,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.update', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3103,8 +3368,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3133,8 +3401,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.delete', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3163,8 +3434,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.isReadable', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3193,8 +3467,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostprototype.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostprototype.isWritable', $params, $arrayKeyProperty);
+        return $this->request('hostprototype.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3223,8 +3500,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('history.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('history.get', $params, $arrayKeyProperty);
+        return $this->request('history.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3253,8 +3533,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.get', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3283,8 +3566,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.exists', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3313,8 +3599,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.checkInput', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.checkInput', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.checkInput', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3343,8 +3632,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.create', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3373,8 +3665,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.update', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3403,8 +3698,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.delete', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3433,8 +3731,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.massAdd', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3463,8 +3764,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.massRemove', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.massRemove', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.massRemove', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3493,8 +3797,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('hostinterface.replaceHostInterfaces', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('hostinterface.replaceHostInterfaces', $params, $arrayKeyProperty);
+        return $this->request('hostinterface.replaceHostInterfaces', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3523,8 +3830,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.get', $params, $arrayKeyProperty);
+        return $this->request('image.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3553,8 +3863,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.getObjects', $params, $arrayKeyProperty);
+        return $this->request('image.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3583,8 +3896,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.exists', $params, $arrayKeyProperty);
+        return $this->request('image.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3613,8 +3929,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.create', $params, $arrayKeyProperty);
+        return $this->request('image.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3643,8 +3962,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.update', $params, $arrayKeyProperty);
+        return $this->request('image.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3673,8 +3995,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('image.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('image.delete', $params, $arrayKeyProperty);
+        return $this->request('image.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3703,8 +4028,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.get', $params, $arrayKeyProperty);
+        return $this->request('iconmap.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3733,8 +4061,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.create', $params, $arrayKeyProperty);
+        return $this->request('iconmap.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3763,8 +4094,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.update', $params, $arrayKeyProperty);
+        return $this->request('iconmap.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3793,8 +4127,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.delete', $params, $arrayKeyProperty);
+        return $this->request('iconmap.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3823,8 +4160,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.isReadable', $params, $arrayKeyProperty);
+        return $this->request('iconmap.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3853,8 +4193,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('iconmap.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('iconmap.isWritable', $params, $arrayKeyProperty);
+        return $this->request('iconmap.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3883,8 +4226,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.get', $params, $arrayKeyProperty);
+        return $this->request('item.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3913,8 +4259,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.getObjects', $params, $arrayKeyProperty);
+        return $this->request('item.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3943,8 +4292,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.exists', $params, $arrayKeyProperty);
+        return $this->request('item.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -3973,8 +4325,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.create', $params, $arrayKeyProperty);
+        return $this->request('item.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4003,8 +4358,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.update', $params, $arrayKeyProperty);
+        return $this->request('item.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4033,8 +4391,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.delete', $params, $arrayKeyProperty);
+        return $this->request('item.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4063,8 +4424,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('item.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4093,8 +4457,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.validateInventoryLinks', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.validateInventoryLinks', $params, $arrayKeyProperty);
+        return $this->request('item.validateInventoryLinks', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4123,8 +4490,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.addRelatedObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.addRelatedObjects', $params, $arrayKeyProperty);
+        return $this->request('item.addRelatedObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4153,8 +4523,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.findInterfaceForItem', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.findInterfaceForItem', $params, $arrayKeyProperty);
+        return $this->request('item.findInterfaceForItem', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4183,8 +4556,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.isReadable', $params, $arrayKeyProperty);
+        return $this->request('item.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4213,8 +4589,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('item.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('item.isWritable', $params, $arrayKeyProperty);
+        return $this->request('item.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4243,8 +4622,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.get', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4273,8 +4655,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.exists', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4303,8 +4688,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.create', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4333,8 +4721,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.update', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4363,8 +4754,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.delete', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4393,8 +4787,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4423,8 +4820,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.addRelatedObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.addRelatedObjects', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.addRelatedObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4453,8 +4853,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.findInterfaceForItem', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.findInterfaceForItem', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.findInterfaceForItem', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4483,8 +4886,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.isReadable', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4513,8 +4919,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('itemprototype.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('itemprototype.isWritable', $params, $arrayKeyProperty);
+        return $this->request('itemprototype.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4543,8 +4952,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('maintenance.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('maintenance.get', $params, $arrayKeyProperty);
+        return $this->request('maintenance.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4573,8 +4985,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('maintenance.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('maintenance.exists', $params, $arrayKeyProperty);
+        return $this->request('maintenance.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4603,8 +5018,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('maintenance.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('maintenance.create', $params, $arrayKeyProperty);
+        return $this->request('maintenance.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4633,8 +5051,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('maintenance.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('maintenance.update', $params, $arrayKeyProperty);
+        return $this->request('maintenance.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4663,8 +5084,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('maintenance.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('maintenance.delete', $params, $arrayKeyProperty);
+        return $this->request('maintenance.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4693,8 +5117,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.get', $params, $arrayKeyProperty);
+        return $this->request('map.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4723,8 +5150,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.getObjects', $params, $arrayKeyProperty);
+        return $this->request('map.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4753,8 +5183,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.exists', $params, $arrayKeyProperty);
+        return $this->request('map.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4783,8 +5216,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.checkInput', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.checkInput', $params, $arrayKeyProperty);
+        return $this->request('map.checkInput', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4813,8 +5249,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.create', $params, $arrayKeyProperty);
+        return $this->request('map.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4843,8 +5282,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.update', $params, $arrayKeyProperty);
+        return $this->request('map.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4873,8 +5315,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.delete', $params, $arrayKeyProperty);
+        return $this->request('map.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4903,8 +5348,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.isReadable', $params, $arrayKeyProperty);
+        return $this->request('map.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4933,8 +5381,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.isWritable', $params, $arrayKeyProperty);
+        return $this->request('map.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4963,8 +5414,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('map.checkCircleSelementsLink', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('map.checkCircleSelementsLink', $params, $arrayKeyProperty);
+        return $this->request('map.checkCircleSelementsLink', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -4993,8 +5447,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('mediatype.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('mediatype.get', $params, $arrayKeyProperty);
+        return $this->request('mediatype.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5023,8 +5480,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('mediatype.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('mediatype.create', $params, $arrayKeyProperty);
+        return $this->request('mediatype.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5053,8 +5513,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('mediatype.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('mediatype.update', $params, $arrayKeyProperty);
+        return $this->request('mediatype.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5083,8 +5546,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('mediatype.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('mediatype.delete', $params, $arrayKeyProperty);
+        return $this->request('mediatype.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5113,8 +5579,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.get', $params, $arrayKeyProperty);
+        return $this->request('proxy.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5143,8 +5612,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.create', $params, $arrayKeyProperty);
+        return $this->request('proxy.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5173,8 +5645,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.update', $params, $arrayKeyProperty);
+        return $this->request('proxy.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5203,8 +5678,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.delete', $params, $arrayKeyProperty);
+        return $this->request('proxy.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5233,8 +5711,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.isReadable', $params, $arrayKeyProperty);
+        return $this->request('proxy.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5263,8 +5744,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('proxy.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('proxy.isWritable', $params, $arrayKeyProperty);
+        return $this->request('proxy.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5293,8 +5777,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.get', $params, $arrayKeyProperty);
+        return $this->request('service.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5323,8 +5810,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.create', $params, $arrayKeyProperty);
+        return $this->request('service.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5353,8 +5843,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.validateUpdate', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.validateUpdate', $params, $arrayKeyProperty);
+        return $this->request('service.validateUpdate', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5383,8 +5876,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.update', $params, $arrayKeyProperty);
+        return $this->request('service.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5413,8 +5909,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.validateDelete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.validateDelete', $params, $arrayKeyProperty);
+        return $this->request('service.validateDelete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5443,8 +5942,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.delete', $params, $arrayKeyProperty);
+        return $this->request('service.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5473,8 +5975,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.addDependencies', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.addDependencies', $params, $arrayKeyProperty);
+        return $this->request('service.addDependencies', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5503,8 +6008,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.deleteDependencies', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.deleteDependencies', $params, $arrayKeyProperty);
+        return $this->request('service.deleteDependencies', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5533,8 +6041,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.validateAddTimes', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.validateAddTimes', $params, $arrayKeyProperty);
+        return $this->request('service.validateAddTimes', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5563,8 +6074,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.addTimes', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.addTimes', $params, $arrayKeyProperty);
+        return $this->request('service.addTimes', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5593,8 +6107,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.getSla', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.getSla', $params, $arrayKeyProperty);
+        return $this->request('service.getSla', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5623,8 +6140,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.deleteTimes', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.deleteTimes', $params, $arrayKeyProperty);
+        return $this->request('service.deleteTimes', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5653,8 +6173,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.isReadable', $params, $arrayKeyProperty);
+        return $this->request('service.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5683,8 +6206,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.isWritable', $params, $arrayKeyProperty);
+        return $this->request('service.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5713,8 +6239,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('service.expandPeriodicalTimes', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('service.expandPeriodicalTimes', $params, $arrayKeyProperty);
+        return $this->request('service.expandPeriodicalTimes', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5743,8 +6272,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screen.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screen.get', $params, $arrayKeyProperty);
+        return $this->request('screen.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5773,8 +6305,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screen.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screen.exists', $params, $arrayKeyProperty);
+        return $this->request('screen.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5803,8 +6338,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screen.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screen.create', $params, $arrayKeyProperty);
+        return $this->request('screen.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5833,8 +6371,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screen.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screen.update', $params, $arrayKeyProperty);
+        return $this->request('screen.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5863,8 +6404,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screen.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screen.delete', $params, $arrayKeyProperty);
+        return $this->request('screen.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5893,8 +6437,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.get', $params, $arrayKeyProperty);
+        return $this->request('screenitem.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5923,8 +6470,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.create', $params, $arrayKeyProperty);
+        return $this->request('screenitem.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5953,8 +6503,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.update', $params, $arrayKeyProperty);
+        return $this->request('screenitem.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -5983,8 +6536,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.updateByPosition', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.updateByPosition', $params, $arrayKeyProperty);
+        return $this->request('screenitem.updateByPosition', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6013,8 +6569,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.delete', $params, $arrayKeyProperty);
+        return $this->request('screenitem.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6043,8 +6602,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.isReadable', $params, $arrayKeyProperty);
+        return $this->request('screenitem.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6073,8 +6635,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('screenitem.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('screenitem.isWritable', $params, $arrayKeyProperty);
+        return $this->request('screenitem.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6103,8 +6668,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.get', $params, $arrayKeyProperty);
+        return $this->request('script.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6133,8 +6701,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.create', $params, $arrayKeyProperty);
+        return $this->request('script.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6163,8 +6734,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.update', $params, $arrayKeyProperty);
+        return $this->request('script.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6193,8 +6767,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.delete', $params, $arrayKeyProperty);
+        return $this->request('script.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6223,8 +6800,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.execute', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.execute', $params, $arrayKeyProperty);
+        return $this->request('script.execute', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6253,8 +6833,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('script.getScriptsByHosts', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('script.getScriptsByHosts', $params, $arrayKeyProperty);
+        return $this->request('script.getScriptsByHosts', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6283,8 +6866,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.pkOption', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.pkOption', $params, $arrayKeyProperty);
+        return $this->request('template.pkOption', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6313,8 +6899,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.get', $params, $arrayKeyProperty);
+        return $this->request('template.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6343,8 +6932,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.getObjects', $params, $arrayKeyProperty);
+        return $this->request('template.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6373,8 +6965,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.exists', $params, $arrayKeyProperty);
+        return $this->request('template.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6403,8 +6998,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.create', $params, $arrayKeyProperty);
+        return $this->request('template.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6433,8 +7031,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.update', $params, $arrayKeyProperty);
+        return $this->request('template.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6463,8 +7064,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.delete', $params, $arrayKeyProperty);
+        return $this->request('template.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6493,8 +7097,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.massAdd', $params, $arrayKeyProperty);
+        return $this->request('template.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6523,8 +7130,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.massUpdate', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.massUpdate', $params, $arrayKeyProperty);
+        return $this->request('template.massUpdate', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6553,8 +7163,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.massRemove', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.massRemove', $params, $arrayKeyProperty);
+        return $this->request('template.massRemove', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6583,8 +7196,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.isReadable', $params, $arrayKeyProperty);
+        return $this->request('template.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6613,8 +7229,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('template.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('template.isWritable', $params, $arrayKeyProperty);
+        return $this->request('template.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6643,8 +7262,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.get', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6673,8 +7295,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.exists', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6703,8 +7328,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.copy', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.copy', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.copy', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6733,8 +7361,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.update', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6763,8 +7394,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.create', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6793,8 +7427,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreen.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreen.delete', $params, $arrayKeyProperty);
+        return $this->request('templatescreen.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6823,8 +7460,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('templatescreenitem.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('templatescreenitem.get', $params, $arrayKeyProperty);
+        return $this->request('templatescreenitem.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6853,8 +7493,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.get', $params, $arrayKeyProperty);
+        return $this->request('trigger.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6883,8 +7526,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.getObjects', $params, $arrayKeyProperty);
+        return $this->request('trigger.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6913,8 +7559,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.exists', $params, $arrayKeyProperty);
+        return $this->request('trigger.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6943,8 +7592,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.checkInput', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.checkInput', $params, $arrayKeyProperty);
+        return $this->request('trigger.checkInput', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -6973,8 +7625,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.create', $params, $arrayKeyProperty);
+        return $this->request('trigger.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7003,8 +7658,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.update', $params, $arrayKeyProperty);
+        return $this->request('trigger.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7033,8 +7691,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.delete', $params, $arrayKeyProperty);
+        return $this->request('trigger.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7063,8 +7724,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.addDependencies', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.addDependencies', $params, $arrayKeyProperty);
+        return $this->request('trigger.addDependencies', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7093,8 +7757,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.deleteDependencies', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.deleteDependencies', $params, $arrayKeyProperty);
+        return $this->request('trigger.deleteDependencies', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7123,8 +7790,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('trigger.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7153,8 +7823,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.syncTemplateDependencies', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.syncTemplateDependencies', $params, $arrayKeyProperty);
+        return $this->request('trigger.syncTemplateDependencies', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7183,8 +7856,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.isReadable', $params, $arrayKeyProperty);
+        return $this->request('trigger.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7213,8 +7889,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('trigger.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('trigger.isWritable', $params, $arrayKeyProperty);
+        return $this->request('trigger.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7243,8 +7922,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('triggerprototype.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('triggerprototype.get', $params, $arrayKeyProperty);
+        return $this->request('triggerprototype.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7273,8 +7955,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('triggerprototype.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('triggerprototype.create', $params, $arrayKeyProperty);
+        return $this->request('triggerprototype.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7303,8 +7988,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('triggerprototype.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('triggerprototype.update', $params, $arrayKeyProperty);
+        return $this->request('triggerprototype.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7333,8 +8021,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('triggerprototype.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('triggerprototype.delete', $params, $arrayKeyProperty);
+        return $this->request('triggerprototype.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7363,8 +8054,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('triggerprototype.syncTemplates', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('triggerprototype.syncTemplates', $params, $arrayKeyProperty);
+        return $this->request('triggerprototype.syncTemplates', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7393,8 +8087,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.get', $params, $arrayKeyProperty);
+        return $this->request('user.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7423,8 +8120,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.create', $params, $arrayKeyProperty);
+        return $this->request('user.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7453,8 +8153,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.update', $params, $arrayKeyProperty);
+        return $this->request('user.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7483,8 +8186,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.updateProfile', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.updateProfile', $params, $arrayKeyProperty);
+        return $this->request('user.updateProfile', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7513,8 +8219,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.delete', $params, $arrayKeyProperty);
+        return $this->request('user.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7543,8 +8252,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.addMedia', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.addMedia', $params, $arrayKeyProperty);
+        return $this->request('user.addMedia', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7573,8 +8285,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.updateMedia', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.updateMedia', $params, $arrayKeyProperty);
+        return $this->request('user.updateMedia', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7603,8 +8318,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.deleteMedia', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.deleteMedia', $params, $arrayKeyProperty);
+        return $this->request('user.deleteMedia', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7633,8 +8351,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.deleteMediaReal', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.deleteMediaReal', $params, $arrayKeyProperty);
+        return $this->request('user.deleteMediaReal', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7663,8 +8384,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.checkAuthentication', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.checkAuthentication', $params, $arrayKeyProperty);
+        return $this->request('user.checkAuthentication', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7693,8 +8417,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.isReadable', $params, $arrayKeyProperty);
+        return $this->request('user.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7723,8 +8450,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('user.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('user.isWritable', $params, $arrayKeyProperty);
+        return $this->request('user.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7753,8 +8483,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.get', $params, $arrayKeyProperty);
+        return $this->request('usergroup.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7783,8 +8516,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.getObjects', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.getObjects', $params, $arrayKeyProperty);
+        return $this->request('usergroup.getObjects', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7813,8 +8549,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.exists', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.exists', $params, $arrayKeyProperty);
+        return $this->request('usergroup.exists', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7843,8 +8582,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.create', $params, $arrayKeyProperty);
+        return $this->request('usergroup.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7873,8 +8615,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.update', $params, $arrayKeyProperty);
+        return $this->request('usergroup.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7903,8 +8648,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.massAdd', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.massAdd', $params, $arrayKeyProperty);
+        return $this->request('usergroup.massAdd', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7933,8 +8681,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.massUpdate', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.massUpdate', $params, $arrayKeyProperty);
+        return $this->request('usergroup.massUpdate', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7963,8 +8714,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.delete', $params, $arrayKeyProperty);
+        return $this->request('usergroup.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -7993,8 +8747,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.isReadable', $params, $arrayKeyProperty);
+        return $this->request('usergroup.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8023,8 +8780,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usergroup.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usergroup.isWritable', $params, $arrayKeyProperty);
+        return $this->request('usergroup.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8053,8 +8813,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.get', $params, $arrayKeyProperty);
+        return $this->request('usermacro.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8083,8 +8846,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.createGlobal', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.createGlobal', $params, $arrayKeyProperty);
+        return $this->request('usermacro.createGlobal', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8113,8 +8879,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.updateGlobal', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.updateGlobal', $params, $arrayKeyProperty);
+        return $this->request('usermacro.updateGlobal', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8143,8 +8912,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.deleteGlobal', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.deleteGlobal', $params, $arrayKeyProperty);
+        return $this->request('usermacro.deleteGlobal', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8173,8 +8945,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.create', $params, $arrayKeyProperty);
+        return $this->request('usermacro.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8203,8 +8978,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.update', $params, $arrayKeyProperty);
+        return $this->request('usermacro.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8233,8 +9011,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.delete', $params, $arrayKeyProperty);
+        return $this->request('usermacro.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8263,8 +9044,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermacro.replaceMacros', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermacro.replaceMacros', $params, $arrayKeyProperty);
+        return $this->request('usermacro.replaceMacros', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8293,8 +9077,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('usermedia.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('usermedia.get', $params, $arrayKeyProperty);
+        return $this->request('usermedia.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8323,8 +9110,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.get', $params, $arrayKeyProperty);
+        return $this->request('httptest.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8353,8 +9143,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.create', $params, $arrayKeyProperty);
+        return $this->request('httptest.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8383,8 +9176,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.update', $params, $arrayKeyProperty);
+        return $this->request('httptest.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8413,8 +9209,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.delete', $params, $arrayKeyProperty);
+        return $this->request('httptest.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8443,8 +9242,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.isReadable', $params, $arrayKeyProperty);
+        return $this->request('httptest.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8473,8 +9275,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('httptest.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('httptest.isWritable', $params, $arrayKeyProperty);
+        return $this->request('httptest.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8503,8 +9308,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.get', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.get', $params, $arrayKeyProperty);
+        return $this->request('webcheck.get', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8533,8 +9341,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.create', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.create', $params, $arrayKeyProperty);
+        return $this->request('webcheck.create', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8563,8 +9374,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.update', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.update', $params, $arrayKeyProperty);
+        return $this->request('webcheck.update', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8593,8 +9407,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.delete', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.delete', $params, $arrayKeyProperty);
+        return $this->request('webcheck.delete', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8623,8 +9440,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.isReadable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.isReadable', $params, $arrayKeyProperty);
+        return $this->request('webcheck.isReadable', $params, $arrayKeyProperty, $auth);
     }
     
     /**
@@ -8653,8 +9473,11 @@ abstract class ZabbixApiAbstract
         // get params array for request
         $params = $this->getRequestParamsArray($params);
 
+        // check if we've to authenticate
+        $auth = in_array('webcheck.isWritable', self::$anonymousFunctions) ? FALSE : TRUE;
+
         // request
-        return $this->request('webcheck.isWritable', $params, $arrayKeyProperty);
+        return $this->request('webcheck.isWritable', $params, $arrayKeyProperty, $auth);
     }
     
 
