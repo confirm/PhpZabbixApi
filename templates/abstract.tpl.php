@@ -135,18 +135,22 @@ abstract class <CLASSNAME_ABSTRACT>
      * @param   $password       Password for Zabbix API.
      * @param   $httpUser       Username for HTTP basic authorization.
      * @param   $httpPassword   Password for HTTP basic authorization.
+     * @param   $authId         Already issued auth (e.g. extracted from cookies)
      */
 
-    public function __construct($apiUrl='', $user='', $password='', $httpUser='', $httpPassword='')
+    public function __construct($apiUrl='', $user='', $password='', $httpUser='', $httpPassword='', $authId='')
     {
         if($apiUrl)
             $this->setApiUrl($apiUrl);
+        if (!$authId) {
+            if ($httpUser && $httpPassword)
+                $this->setBasicAuthorization($httpUser, $httpPassword);
 
-        if ($httpUser && $httpPassword)
-            $this->setBasicAuthorization($httpUser, $httpPassword);
-
-        if($user && $password)
-            $this->userLogin(array('user' => $user, 'password' => $password));
+            if($user && $password)
+                $this->userLogin(array('user' => $user, 'password' => $password));
+        }
+        else
+            $this->auth=$authId;
     }
 
     /**
