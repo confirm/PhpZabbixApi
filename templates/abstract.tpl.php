@@ -142,15 +142,14 @@ abstract class <CLASSNAME_ABSTRACT>
     {
         if($apiUrl)
             $this->setApiUrl($apiUrl);
-        if (!authId) {
-            if ($httpUser && $httpPassword)
-                $this->setBasicAuthorization($httpUser, $httpPassword);
 
-            if($user && $password)
-                $this->userLogin(array('user' => $user, 'password' => $password));
-        }
-        else
-            $this->auth=$authId;
+        if ($httpUser && $httpPassword)
+            $this->setBasicAuthorization($httpUser, $httpPassword);
+
+        if ($authId)
+            $this->setAuthId($authId);
+        elseif($user && $password)
+            $this->userLogin(array('user' => $user, 'password' => $password));
     }
 
     /**
@@ -175,6 +174,20 @@ abstract class <CLASSNAME_ABSTRACT>
     public function setApiUrl($apiUrl)
     {
         $this->apiUrl = $apiUrl;
+        return $this;
+    }
+
+    /**
+     * @brief   Sets the API authorization ID.
+     *
+     * @param   $authId     API auth ID.
+     *
+     * @retval  <CLASSNAME_ABSTRACT>
+     */
+
+    public function setAuthId($authId)
+    {
+        $this->authId = $authId;
         return $this;
     }
 
