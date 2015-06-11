@@ -142,7 +142,7 @@ abstract class <CLASSNAME_ABSTRACT>
     {
         if($apiUrl)
             $this->setApiUrl($apiUrl);
-        if (!authId) {
+        if (!$authId) {
             if ($httpUser && $httpPassword)
                 $this->setBasicAuthorization($httpUser, $httpPassword);
 
