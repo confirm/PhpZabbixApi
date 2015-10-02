@@ -262,11 +262,12 @@ abstract class <CLASSNAME_ABSTRACT>
      * @param   $method     Name of the API method.
      * @param   $params     Additional parameters.
      * @param   $auth       Enable auth string (default TRUE).
+     * @param   $verifyPeer Verify SSL peer (default TRUE).
      *
      * @retval  stdClass    API JSON response.
      */
 
-    public function request($method, $params=NULL, $resultArrayKey='', $auth=TRUE)
+    public function request($method, $params=NULL, $resultArrayKey='', $auth=TRUE, $verifyPeer=TRUE)
     {
 
         // sanity check and conversion for params array
@@ -305,11 +306,17 @@ abstract class <CLASSNAME_ABSTRACT>
             echo 'API request: '.$this->requestEncoded;
 
         // do request
-        $streamContext = stream_context_create(array('http' => array(
-            'method'  => 'POST',
-            'header'  => 'Content-type: application/json-rpc'."\r\n".$this->extraHeaders,
-            'content' => $this->requestEncoded
-        )));
+        $streamContext = stream_context_create(array(
+            'http' => array(
+                'method'  => 'POST',
+                'header'  => 'Content-type: application/json-rpc'."\r\n".$this->extraHeaders,
+                'content' => $this->requestEncoded
+            ),
+            'ssl' => array(
+                'verify_peer'       => $verifyPeer,
+                'verify_peer_name'  => $verifyPeer
+            )
+        ));
 
         // get file handler
         $fileHandler = @fopen($this->getApiUrl(), 'rb', false, $streamContext);
