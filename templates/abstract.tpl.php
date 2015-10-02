@@ -128,6 +128,12 @@ abstract class <CLASSNAME_ABSTRACT>
     private $extraHeaders = '';
 
     /**
+     * @brief   Flag to verify SSL peer.
+     */
+
+    private $verifyPeer = TRUE;
+
+    /**
      * @brief   Class constructor.
      *
      * @param   $apiUrl         API url (e.g. http://FQDN/zabbix/api_jsonrpc.php)
@@ -211,6 +217,20 @@ abstract class <CLASSNAME_ABSTRACT>
     }
 
     /**
+     * @brief   Sets the flag to verify the SSL peer.
+     *
+     * @param   $verify     Flag to verify SSL peer
+     *
+     * @retval  <CLASSNAME_ABSTRACT>
+     */
+
+    public function setVerifyPeer($verify=TRUE)
+    {
+        $this->verifyPeer = (bool) $verify;
+        return $this;
+    }
+
+    /**
      * @brief   Returns the default params.
      *
      * @retval  array   Array with default params.
@@ -262,12 +282,11 @@ abstract class <CLASSNAME_ABSTRACT>
      * @param   $method     Name of the API method.
      * @param   $params     Additional parameters.
      * @param   $auth       Enable auth string (default TRUE).
-     * @param   $verifyPeer Verify SSL peer (default TRUE).
      *
      * @retval  stdClass    API JSON response.
      */
 
-    public function request($method, $params=NULL, $resultArrayKey='', $auth=TRUE, $verifyPeer=TRUE)
+    public function request($method, $params=NULL, $resultArrayKey='', $auth=TRUE)
     {
 
         // sanity check and conversion for params array
@@ -313,8 +332,8 @@ abstract class <CLASSNAME_ABSTRACT>
                 'content' => $this->requestEncoded
             ),
             'ssl' => array(
-                'verify_peer'       => $verifyPeer,
-                'verify_peer_name'  => $verifyPeer
+                'verify_peer'       => $this->verifyPeer,
+                'verify_peer_name'  => $this->verifyPeer
             )
         ));
 
