@@ -153,12 +153,12 @@ abstract class <CLASSNAME_ABSTRACT>
         if ($httpUser && $httpPassword)
             $this->setBasicAuthorization($httpUser, $httpPassword);
 
+        $this->setVerifyPeer($verifyPeer);
+
         if ($authId)
             $this->setAuthId($authId);
         elseif($user && $password)
             $this->userLogin(array('user' => $user, 'password' => $password));
-
-        $this->setVerifyPeer($verifyPeer);
     }
 
     /**
