@@ -410,14 +410,14 @@ abstract class <CLASSNAME_ABSTRACT>
             return $objectArray;
 
         // loop through array and replace keys
+        $newObjectArray = array();
         foreach($objectArray as $key => $object)
         {
-            unset($objectArray[$key]);
-            $objectArray[$object->{$useObjectProperty}] = $object;
+            $newObjectArray[$object->{$useObjectProperty}] = $object;
         }
 
         // return associative array
-        return $objectArray;
+        return $newObjectArray;
     }
 
     /**
