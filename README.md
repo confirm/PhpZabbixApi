@@ -142,8 +142,6 @@ $api = new ZabbixApi('http://zabbix.confirm.ch/api_jsonrpc.php', 'zabbix_user', 
 
 ## Examples
 
-Please see also [the old project page](http://zabbixapi.confirm.ch/) for more examples.
-
 ### Simple request
 
 Here's a simple request to fetch all defined graphs via [graph.get API method](https://www.zabbix.com/documentation/2.4/manual/api/reference/graph/get):
