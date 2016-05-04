@@ -128,10 +128,10 @@ abstract class ZabbixApiAbstract
     private $extraHeaders = '';
 
     /**
-     * @brief   Flag to verify SSL peer.
+     * @brief   SSL context.
      */
 
-    private $verifyPeer = TRUE;
+    private $sslContext = array();
 
     /**
      * @brief   Class constructor.
@@ -142,10 +142,10 @@ abstract class ZabbixApiAbstract
      * @param   $httpUser       Username for HTTP basic authorization.
      * @param   $httpPassword   Password for HTTP basic authorization.
      * @param   $authId         Already issued auth (e.g. extracted from cookies)
-     * @param   $verifyPeer     Verify SSL peer.
+     * @param   $sslContext     SSL context for SSL-enabled connections
      */
 
-    public function __construct($apiUrl='', $user='', $password='', $httpUser='', $httpPassword='', $authId='', $verifyPeer=TRUE)
+    public function __construct($apiUrl='', $user='', $password='', $httpUser='', $httpPassword='', $authId='', $sslContext=NULL)
     {
         if($apiUrl)
             $this->setApiUrl($apiUrl);
@@ -153,7 +153,8 @@ abstract class ZabbixApiAbstract
         if ($httpUser && $httpPassword)
             $this->setBasicAuthorization($httpUser, $httpPassword);
 
-        $this->setVerifyPeer($verifyPeer);
+        if($sslContext)
+            $this->setSslContext($sslContext);
 
         if ($authId)
             $this->setAuthId($authId);
@@ -220,16 +221,18 @@ abstract class ZabbixApiAbstract
     }
 
     /**
-     * @brief   Sets the flag to verify the SSL peer.
+     * @brief   Sets the context for SSL-enabled connections.
      *
-     * @param   $verify     Flag to verify SSL peer
+     * See http://php.net/manual/en/context.ssl.php for more informations.
+     *
+     * @param   $context    Array with the SSL context
      *
      * @retval  ZabbixApiAbstract
      */
 
-    public function setVerifyPeer($verify=TRUE)
+    public function setSslContext($context)
     {
-        $this->verifyPeer = (bool) $verify;
+        $this->sslContext = $context;
         return $this;
     }
 
@@ -327,18 +330,19 @@ abstract class ZabbixApiAbstract
         if($this->printCommunication)
             echo 'API request: '.$this->requestEncoded;
 
-        // do request
-        $streamContext = stream_context_create(array(
+        // initialize context
+        $context = array(
             'http' => array(
                 'method'  => 'POST',
                 'header'  => 'Content-type: application/json-rpc'."\r\n".$this->extraHeaders,
                 'content' => $this->requestEncoded
-            ),
-            'ssl' => array(
-                'verify_peer'       => $this->verifyPeer,
-                'verify_peer_name'  => $this->verifyPeer
             )
-        ));
+        );
+        if($this->sslContext)
+            $context['ssl'] = $this->sslContext;
+
+        // create stream context
+        $streamContext = stream_context_create($context);
 
         // get file handler
         $fileHandler = @fopen($this->getApiUrl(), 'rb', false, $streamContext);
@@ -410,14 +414,14 @@ abstract class ZabbixApiAbstract
             return $objectArray;
 
         // loop through array and replace keys
+        $newObjectArray = array();
         foreach($objectArray as $key => $object)
         {
-            unset($objectArray[$key]);
-            $objectArray[$object->{$useObjectProperty}] = $object;
+            $newObjectArray[$object->{$useObjectProperty}] = $object;
         }
 
         // return associative array
-        return $objectArray;
+        return $newObjectArray;
     }
 
     /**
@@ -500,7 +504,7 @@ abstract class ZabbixApiAbstract
 
         // build filename for cached auth token
         if($tokenCacheDir && array_key_exists('user', $params) && is_dir($tokenCacheDir))
-            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user']);
+            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user'].posix_getuid());
 
         // try to read cached auth token
         if(isset($tokenCacheFile) && is_file($tokenCacheFile))
