@@ -495,7 +495,10 @@ abstract class <CLASSNAME_ABSTRACT>
 
         // build filename for cached auth token
         if($tokenCacheDir && array_key_exists('user', $params) && is_dir($tokenCacheDir))
-            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user'].'|'.posix_getuid());
+        {
+            $uid            = function_exists('posix_getuid') ? posix_getuid() : -1;
+            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($params['user'].'|'.$uid);
+        }
 
         // try to read cached auth token
         if(isset($tokenCacheFile) && is_file($tokenCacheFile))
