@@ -31,8 +31,6 @@
 
 namespace ZabbixApi;
 
-require '<FILENAME_ABSTRACT>';
-
 /**
  * @brief   Concrete class for the Zabbix API.
  */
@@ -41,5 +39,3 @@ class <CLASSNAME_CONCRETE> extends <CLASSNAME_ABSTRACT>
 {
 
 }
-
-?>

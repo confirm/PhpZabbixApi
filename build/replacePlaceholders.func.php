@@ -42,5 +42,3 @@ function replacePlaceholders($string, $placeholders)
 
     return $string;
 }
-
-?>

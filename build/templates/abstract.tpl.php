@@ -45,14 +45,6 @@
 namespace ZabbixApi;
 
 /**
- * @brief   Exception class for ZabbixApi namespace.
- */
-
-class Exception extends \Exception
-{
-}
-
-/**
  * @brief   Abstract class for the Zabbix API.
  */
 
@@ -282,7 +274,7 @@ abstract class <CLASSNAME_ABSTRACT>
     }
 
     /**
-     * @brief   Sends are request to the zabbix API and returns the response
+     * @brief   Sends are request to the Zabbix API and returns the response
      *          as object.
      *
      * @param   $method     Name of the API method.
@@ -421,7 +413,7 @@ abstract class <CLASSNAME_ABSTRACT>
      * This method will automatically convert all provided types into a correct
      * array. Which means:
      *
-     *      - arrays will not be converted (indexed & associatve)
+     *      - arrays will not be converted (indexed & associative)
      *      - scalar values will be converted into an one-element array (indexed)
      *      - other values will result in an empty array
      *
@@ -431,7 +423,7 @@ abstract class <CLASSNAME_ABSTRACT>
      * indexed array, the default params will not be merged. This is because
      * there are some API methods, which are expecting a simple JSON array (aka
      * PHP indexed array) instead of an object (aka PHP associative array).
-     * Example for this behaviour are delete operations, which are directly
+     * Example for this behavior are delete operations, which are directly
      * expecting an array of IDs '[ 1,2,3 ]' instead of '{ ids: [ 1,2,3 ] }'.
      *
      * @param   $params     Params array.
@@ -460,7 +452,7 @@ abstract class <CLASSNAME_ABSTRACT>
     /**
      * @brief   Login into the API.
      *
-     * This will also retreive the auth Token, which will be used for any
+     * This will also retrieves the auth Token, which will be used for any
      * further requests. Please be aware that by default the received auth
      * token will be cached on the filesystem.
      *
@@ -474,10 +466,10 @@ abstract class <CLASSNAME_ABSTRACT>
      * For more informations about these parameters, check the Zabbix API
      * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * The $arrayKeyProperty can be used to get an associative instead of an
      * indexed array as response. A valid value for the $arrayKeyProperty is
-     * is any property of the returned JSON objects (e.g. name, host,
-     * hostid, graphid, screenitemid).
+     * is any property of the returned JSON objects (e.g. "name", "host",
+     * "hostid", "graphid", "screenitemid").
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
@@ -544,10 +536,10 @@ abstract class <CLASSNAME_ABSTRACT>
      * For more informations about these parameters, check the Zabbix API
      * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * The $arrayKeyProperty can be used to get an associative instead of an
      * indexed array as response. A valid value for the $arrayKeyProperty is
-     * is any property of the returned JSON objects (e.g. name, host,
-     * hostid, graphid, screenitemid).
+     * is any property of the returned JSON objects (e.g. "name", "host",
+     * "hostid", "graphid", "screenitemid").
      *
      * @param   $params             Parameters to pass through.
      * @param   $arrayKeyProperty   Object property for key of array.
@@ -567,17 +559,17 @@ abstract class <CLASSNAME_ABSTRACT>
 
     <!START_API_METHOD>
     /**
-     * @brief   Reqeusts the Zabbix API and returns the response of the API
+     * @brief   Requests the Zabbix API and returns the response of the API
      *          method <API_METHOD>.
      *
      * The $params Array can be used, to pass parameters to the Zabbix API.
      * For more informations about these parameters, check the Zabbix API
      * documentation at https://www.zabbix.com/documentation/.
      *
-     * The $arrayKeyProperty can be used to get an associatve instead of an
+     * The $arrayKeyProperty can be used to get an associative instead of an
      * indexed array as response. A valid value for the $arrayKeyProperty is
-     * is any property of the returned JSON objects (e.g. name, host,
-     * hostid, graphid, screenitemid).
+     * is any property of the returned JSON objects (e.g. "name", "host",
+     * "hostid", "graphid", "screenitemid").
      *
      * @param   $params             Zabbix API parameters.
      * @param   $arrayKeyProperty   Object property for key of array.
@@ -601,5 +593,3 @@ abstract class <CLASSNAME_ABSTRACT>
     <!END_API_METHOD>
 
 }
-
-?>

@@ -27,13 +27,13 @@
  * @brief   Class name for the abstract API class.
  */
 
-define('CLASSNAME_ABSTRACT', 'ZabbixApiAbstract');
+define('CLASSNAME_ABSTRACT', 'AbstractZabbixApi');
 
 /**
  * @brief   Filename for the abstract API class.
  */
 
-define('FILENAME_ABSTRACT', CLASSNAME_ABSTRACT.'.class.php');
+define('FILENAME_ABSTRACT', CLASSNAME_ABSTRACT.'.php');
 
 /**
  * @brief   Class name for the concrete API class.
@@ -45,7 +45,19 @@ define('CLASSNAME_CONCRETE', 'ZabbixApi');
  * @brief   Filename for the abstract API class.
  */
 
-define('FILENAME_CONCRETE', CLASSNAME_CONCRETE.'.class.php');
+define('FILENAME_CONCRETE', CLASSNAME_CONCRETE.'.php');
+
+/**
+ * @brief   Class name for the abstract API class.
+ */
+
+define('CLASSNAME_EXCEPTION', 'Exception');
+
+/**
+ * @brief   Filename for the abstract API class.
+ */
+
+define('FILENAME_EXCEPTION', CLASSNAME_EXCEPTION.'.php');
 
 /**
  * @brief   Filesystem path to templates directory.
@@ -53,7 +65,7 @@ define('FILENAME_CONCRETE', CLASSNAME_CONCRETE.'.class.php');
  * This directory contains all templates to build the class files.
  */
 
-define('PATH_TEMPLATES', 'templates');
+define('PATH_TEMPLATES', __DIR__.'/templates');
 
 /**
  * @brief   Filesystem path to build directory.
@@ -61,7 +73,7 @@ define('PATH_TEMPLATES', 'templates');
  * This directory contains the built class files.
  */
 
-define('PATH_BUILD', 'build');
+define('PATH_BUILD', __DIR__.'/../src');
 
 /**
  * @brief   Filesystem path to the Zabbix PHP front-end root.
@@ -73,5 +85,4 @@ define('PATH_BUILD', 'build');
  * to update this constant!
  */
 
-define('PATH_ZABBIX', '/usr/share/zabbix');
-?>
+define('PATH_ZABBIX', '/opt/zabbix/frontend');
