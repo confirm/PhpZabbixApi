@@ -2,8 +2,8 @@
     "name": "confirm-it-solutions/php-zabbix-api",
     "type": "library",
     "description": "PhpZabbixApi library",
-    "keywords": ["zabbix","api"],
-    "homepage": "http://github.com/confirm-it-solutions/PhpZabbixApi",
+    "keywords": ["zabbix", "api"],
+    "homepage": "https://github.com/confirm/PhpZabbixApi",
     "license": "MIT",
     "authors": [
         {
@@ -14,9 +14,14 @@
         }
     ],
     "require": {
-        "php": "^5.3|^7.0"
+        "php": "^5.3|^7.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-pcre": "*"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^1.13|^2.16",
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
     },
     "autoload": {
@@ -24,6 +29,9 @@
     },
     "autoload-dev": {
         "psr-4": { "ZabbixApi\\Tests\\": ["tests/"] }
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {

@@ -1,82 +1,76 @@
 <?php
-/**
- * @file    config.inc.php
- *
- * @brief   Configuration file of the PhPZabbixApi builder.
- *
+
+/*
  * This file is part of PhpZabbixApi.
  *
- * PhpZabbixApi is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * PhpZabbixApi is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with PhpZabbixApi.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  *
- * @copyright   GNU General Public License
- * @author      confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
+ * @copyright The MIT License (MIT)
+ * @author confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
  */
 
 /**
- * @brief   Class name for the abstract API class.
+ * Class name for the abstract API class.
  */
-
 define('CLASSNAME_ABSTRACT', 'AbstractZabbixApi');
 
 /**
- * @brief   Filename for the abstract API class.
+ * Filename for the abstract API class.
  */
-
 define('FILENAME_ABSTRACT', CLASSNAME_ABSTRACT.'.php');
 
 /**
- * @brief   Class name for the concrete API class.
+ * Class name for the concrete API class.
  */
-
 define('CLASSNAME_CONCRETE', 'ZabbixApi');
 
 /**
- * @brief   Filename for the abstract API class.
+ * Filename for the abstract API class.
  */
-
 define('FILENAME_CONCRETE', CLASSNAME_CONCRETE.'.php');
 
 /**
- * @brief   Class name for the abstract API class.
+ * Class name for the abstract API class.
  */
-
 define('CLASSNAME_EXCEPTION', 'Exception');
 
 /**
- * @brief   Filename for the abstract API class.
+ * Filename for the abstract API class.
  */
-
 define('FILENAME_EXCEPTION', CLASSNAME_EXCEPTION.'.php');
 
 /**
- * @brief   Filesystem path to templates directory.
+ * Filesystem path to templates directory.
  *
  * This directory contains all templates to build the class files.
  */
-
 define('PATH_TEMPLATES', __DIR__.'/templates');
 
 /**
- * @brief   Filesystem path to build directory.
+ * Filesystem path to build directory.
  *
  * This directory contains the built class files.
  */
-
 define('PATH_BUILD', __DIR__.'/../src');
 
 /**
- * @brief   Filesystem path to the Zabbix PHP front-end root.
+ * Filesystem path to the Zabbix PHP front-end root.
  *
  * Trailing slash not required!
  *
@@ -84,5 +78,4 @@ define('PATH_BUILD', __DIR__.'/../src');
  * the Zabbix PHP front-end (v2) on the same server, you probably only have
  * to update this constant!
  */
-
 define('PATH_ZABBIX', '/opt/zabbix/frontend');
