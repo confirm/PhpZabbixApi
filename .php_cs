@@ -42,6 +42,7 @@ return Symfony\CS\Config\Config::create()
         '-phpdoc_params',
         '-phpdoc_to_comment',
         '-psr0',
+        '-single_quote',
         'unalign_double_arrow',
         'unalign_equals',
     ))

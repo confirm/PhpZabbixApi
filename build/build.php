@@ -184,11 +184,47 @@ if (!$template = file_get_contents(PATH_TEMPLATES.'/abstract.tpl.php')) {
 }
 
 // fetch API method block
-preg_match('/(.*)<!START_API_METHOD>(.*)<!END_API_METHOD>(.*)/s', $template, $matches);
+preg_match('/(.*)<!START_API_CONSTANT>(.*)<!END_API_CONSTANT>(.*)<!START_API_METHOD>(.*)<!END_API_METHOD>(.*)/s', $template, $matches);
 
 // sanity check
-if (4 !== count($matches)) {
-    throw new RuntimeException('Template "'.PATH_TEMPLATES.'"/abstract.tpl.php parsing failed!');
+if (6 !== count($matches)) {
+    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/abstract.tpl.php" parsing failed!');
+}
+
+$defines = file_get_contents(PATH_ZABBIX.'/include/defines.inc.php');
+preg_match_all('{^define\(\'(?<constant_names>[^\']+)\',\s*(?!\);)(?<constant_values>.+)\)\;.*\n}m', $defines, $constantsArray);
+
+// initialize variable for API constants
+$apiConstants = '';
+
+$blacklistedConstants = array('HTTPS', 'ZBX_FONTPATH');
+
+// build API constants
+foreach ($constantsArray['constant_names'] as $k => $name) {
+    if (0 === strpos($name, 'ZBX_STYLE_') || in_array($name, $blacklistedConstants, true)) {
+        continue;
+    }
+    $value = $constantsArray['constant_values'][$k];
+
+    foreach ($constantsArray['constant_names'] as $declaredName) {
+        if (false !== strpos($value, $declaredName)) {
+            if (version_compare(PHP_VERSION, '5.6') >= 0) {
+                $declaredNameValue = 'self::'.$declaredName;
+                $value = preg_replace('#\b'.$declaredName.'\b#', $declaredNameValue, $value);
+            } elseif (false !== $declaredNameKey = array_search($declaredName, $constantsArray['constant_names'], true)) {
+                $declaredNameValue = $constantsArray['constant_values'][$declaredNameKey];
+                $value = eval('return '.preg_replace('#\b'.$declaredName.'\b#', $declaredNameValue, $value).';');
+                if (is_string($value)) {
+                    $value = '\''.$value.'\'';
+                }
+            }
+        }
+    }
+    $constantPlaceholders = array(
+        'PHP_CONST_NAME' => $name,
+        'PHP_CONST_VALUE' => $value,
+    );
+    $apiConstants .= replacePlaceholders($matches[2], $constantPlaceholders);
 }
 
 // initialize variable for API methods
@@ -201,12 +237,12 @@ foreach ($apiArray as $resource => $actions) {
             'API_METHOD' => $resource.'.'.$action,
             'PHP_METHOD' => $resource.ucfirst($action),
         );
-        $apiMethods .= replacePlaceholders($matches[2], $methodPlaceholders);
+        $apiMethods .= replacePlaceholders($matches[4], $methodPlaceholders);
     }
 }
 
 // build file content
-$fileContent = replacePlaceholders($matches[1].$apiMethods.$matches[3], $templatePlaceholders);
+$fileContent = replacePlaceholders($matches[1].$apiConstants.$matches[3].$apiMethods.$matches[5], $templatePlaceholders);
 
 // write abstract class
 if (!file_put_contents(PATH_BUILD.'/'.FILENAME_ABSTRACT, $fileContent)) {
