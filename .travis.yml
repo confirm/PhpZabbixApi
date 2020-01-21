@@ -108,11 +108,34 @@ cache:
 
 before_install:
     - |
-      # General configuration
+      # Install dependencies
+      sudo apt-get update
+      sudo apt-get install apache2 sqlite3
+    - |
+      # Download zabbix server frontend
       stty cols 120
       mkdir -p /opt/zabbix
-      wget -qO- https://repo.zabbix.com/zabbix/$(echo $ZABBIX_VERSION | cut -d. -f-2)/ubuntu/pool/main/z/zabbix/zabbix_$ZABBIX_VERSION.orig.tar.gz | tar xvz -C /opt/zabbix
+      wget -qO- wget -qO- https://repo.zabbix.com/zabbix/${ZABBIX_VERSION%.*}/ubuntu/pool/main/z/zabbix/zabbix_${ZABBIX_VERSION}.orig.tar.gz | tar xvzf - -C /opt/zabbix zabbix-${ZABBIX_VERSION}/frontends/php zabbix-${ZABBIX_VERSION}/database/sqlite3/
       ln -s /opt/zabbix/zabbix-$ZABBIX_VERSION/frontends/php/ /opt/zabbix/frontend
+    - |
+      # Config php-fpm server
+      sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+      echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+      sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
+      sudo chown -R travis:travis /var/lib/apache2/fastcgi
+      ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+    - |
+      # Config apache2 server
+      sudo a2enmod rewrite actions proxy proxy_fcgi fastcgi alias
+      sudo sed -ri 's#DocumentRoot /var/www/html#DocumentRoot /opt/zabbix/frontend/#; s#(</VirtualHost>)#\tProxyPassMatch ^/(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/opt/zabbix/frontend/$1\n\t<Directory "/opt/zabbix/frontend">\n\t\tRequire all granted\n\t\tAllowOverride All\n\t</Directory>\n\1#' /etc/apache2/sites-available/000-default.conf
+      cat /etc/apache2/sites-available/000-default.conf
+      sudo systemctl restart apache2
+
+    - |
+      # Config sqlite database
+      sqlite3 /opt/zabbix/zabbix.db < /opt/zabbix/zabbix-$ZABBIX_VERSION/database/sqlite3/schema.sql
+      sqlite3 /opt/zabbix/zabbix.db < /opt/zabbix/zabbix-$ZABBIX_VERSION/database/sqlite3/data.sql
+      echo -e '<?php\nglobal $DB;\n$DB["TYPE"] = "SQLITE3";\n$DB["DATABASE"] = "/opt/zabbix/zabbix.db";\n$ZBX_SERVER = "PhpZabbixApi";\n$ZBX_SERVER_PORT = "10051";\n$ZBX_SERVER_NAME = "Test Server";\n$IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;\n' > /opt/zabbix/frontend/conf/zabbix.conf.php
 
 install:
     - php ./build/build.php
@@ -120,3 +143,5 @@ install:
 
 script:
     - ./vendor/bin/phpunit
+    - ./vendor/bin/phpunit --testdox
+
