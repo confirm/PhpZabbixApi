@@ -29,6 +29,8 @@ namespace ZabbixApi;
 
 /**
  * Concrete class for the Zabbix API.
+ *
+ * @final since confirm-it-solutions/php-zabbix-api 2.x
  */
 class <CLASSNAME_CONCRETE> extends <CLASSNAME_ABSTRACT>
 {
