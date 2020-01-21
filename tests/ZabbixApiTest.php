@@ -39,9 +39,20 @@ final class ZabbixApiTest extends TestCase
     {
         $this->assertTrue(class_exists('ZabbixApi\ZabbixApi'));
 
-        $rc = new \ReflectionClass('ZabbixApi\ZabbixApi');
+        $zabbix = new ZabbixApi('http://localhost/json_rpc.php');
 
-        $this->assertGreaterThanOrEqual(405, $rc->getMethods(\ReflectionMethod::IS_PUBLIC));
+        $defaultParams = array(
+            'some_param' => array('one'),
+        );
+        $zabbix->setDefaultParams($defaultParams);
+        $this->assertSame('http://localhost/json_rpc.php', $zabbix->getApiUrl());
+        $this->assertSame($defaultParams, $zabbix->getDefaultParams());
+        $this->assertSame('', $zabbix->getRequest());
+        $this->assertSame('', $zabbix->getResponse());
+
+        $ro = new \ReflectionObject($zabbix);
+
+        $this->assertGreaterThanOrEqual(360, count($ro->getMethods(\ReflectionMethod::IS_PUBLIC)));
     }
 
     public function testZabbixApiConnectionNotTriggered()
