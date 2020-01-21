@@ -433,7 +433,7 @@ abstract class <CLASSNAME_ABSTRACT>
             try {
                 // get auth token and try to execute a user.get (dummy check)
                 $this->authToken = file_get_contents($tokenCacheFile);
-                $this->userGet();
+                $this->userGet(array('countOutput' => true));
             } catch (Exception $e) {
                 // user.get failed, token invalid so reset it and remove file
                 $this->authToken = '';
