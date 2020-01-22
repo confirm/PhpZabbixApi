@@ -55,6 +55,83 @@ final class ZabbixApiTest extends TestCase
         $this->assertGreaterThanOrEqual(360, count($ro->getMethods(\ReflectionMethod::IS_PUBLIC)));
     }
 
+    public function testUserLoginOnConsecutiveCalls()
+    {
+        $user = 'zabbix';
+        $pass = 'very_secret';
+        $authToken = '4u7ht0k3n';
+        $cacheDir = __DIR__.'/.token_cache';
+
+        $this->createTokenCacheDir($cacheDir);
+
+        $zabbix = $this->getMockBuilder('ZabbixApi\ZabbixApi')
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->setMethods(array('request', 'userGet'))
+            ->getMock();
+
+        // `userGet()` must not be called if the argument 3 (`$tokenCacheDir`) is passed with value `null`.
+        $zabbix
+            ->expects($this->never())
+            ->method('userGet')
+            ->with(array('countOutput' => true));
+
+        // `request()` must be called in order to retrieve the token.
+        $zabbix
+            ->expects($this->once())
+            ->method('request')
+            ->with('user.login')
+            ->willReturn($authToken);
+
+        $this->assertSame($authToken, $zabbix->userLogin(array('user' => $user, 'password' => $pass), '', null));
+
+        $zabbix = $this->getMockBuilder('ZabbixApi\ZabbixApi')
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->setMethods(array('request', 'userGet'))
+            ->getMock();
+
+        // `userGet()` must not be called since the token cache file is not created yet.
+        $zabbix
+            ->expects($this->never())
+            ->method('userGet')
+            ->with(array('countOutput' => true));
+
+        // `request()` must be called in order to retrieve the token.
+        $zabbix
+            ->expects($this->once())
+            ->method('request')
+            ->with('user.login')
+            ->willReturn($authToken);
+
+        $this->assertSame($authToken, $zabbix->userLogin(array('user' => $user, 'password' => $pass), '', $cacheDir));
+
+        $zabbix = $this->getMockBuilder('ZabbixApi\ZabbixApi')
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->setMethods(array('request', 'userGet'))
+            ->getMock();
+
+        // `userGet()` must be called since the token at token cache file must be validated.
+        $zabbix
+            ->expects($this->once())
+            ->method('userGet')
+            ->with(array('countOutput' => true));
+
+        // `request()` must not be called since the token was already retrieved from the token cache file.
+        $zabbix
+            ->expects($this->never())
+            ->method('request')
+            ->with('user.login');
+
+        $this->assertSame($authToken, $zabbix->userLogin(array('user' => $user, 'password' => $pass), '', $cacheDir));
+
+        $this->removeTokenCacheDir($cacheDir);
+    }
+
     public function testZabbixApiConnectionNotTriggered()
     {
         $zabbix = new ZabbixApi('http://localhost/json_rpc.php');
@@ -71,5 +148,37 @@ final class ZabbixApiTest extends TestCase
     public function testZabbixApiConnectionError()
     {
         new ZabbixApi('http://not.found.tld/json_rpc.php', 'zabbix', 'very_secret_pass');
+    }
+
+    /**
+     * @param string $cacheDir
+     */
+    private function createTokenCacheDir($cacheDir)
+    {
+        if (is_dir($cacheDir)) {
+            return;
+        }
+
+        mkdir($cacheDir);
+    }
+
+    /**
+     * @param string $cacheDir
+     */
+    private function removeTokenCacheDir($cacheDir)
+    {
+        if (!is_dir($cacheDir)) {
+            return;
+        }
+
+        // Remove the token cache directory.
+        foreach (glob($cacheDir.'/{,.}*', GLOB_BRACE) as $file) {
+            if (is_dir($file)) {
+                continue;
+            }
+            unlink($file);
+        }
+
+        rmdir($cacheDir);
     }
 }
