@@ -56,6 +56,16 @@ abstract class <CLASSNAME_ABSTRACT>
     private $defaultParams = array();
 
     /**
+     * @var string
+     */
+    private $user;
+
+    /**
+     * @var string
+     */
+    private $password;
+
+    /**
      * Auth string.
      *
      * @var string
@@ -137,7 +147,8 @@ abstract class <CLASSNAME_ABSTRACT>
         if ($authToken) {
             $this->setAuthToken($authToken);
         } elseif ($user && $password) {
-            $this->userLogin(array('user' => $user, 'password' => $password));
+            $this->user = $user;
+            $this->password = $password;
         }
     }
 
@@ -270,6 +281,10 @@ abstract class <CLASSNAME_ABSTRACT>
      */
     public function request($method, $params = null, $resultArrayKey = '', $auth = true)
     {
+        if (!$this->authToken && $auth && $this->user && $this->password) {
+            $this->userLogin(array('user' => $this->user, 'password' => $this->password));
+        }
+
         // sanity check and conversion for params array
         if (!$params) {
             $params = array();

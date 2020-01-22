@@ -41,7 +41,7 @@ final class ZabbixApiTest extends TestCase
 
         $this->assertGreaterThanOrEqual(0, version_compare(ZabbixApi::ZABBIX_VERSION, '2.4'));
 
-        $zabbix = new ZabbixApi('http://localhost/json_rpc.php');
+        $zabbix = new ZabbixApi('http://localhost/json_rpc.php', 'zabbix', 'very_secret');
 
         $defaultParams = array(
             'some_param' => array('one'),
@@ -170,22 +170,15 @@ final class ZabbixApiTest extends TestCase
         );
     }
 
-    public function testZabbixApiConnectionNotTriggered()
-    {
-        $zabbix = new ZabbixApi('http://localhost/json_rpc.php');
-        $zabbix = new ZabbixApi('http://localhost/json_rpc.php', 'zabbix');
-        $zabbix = new ZabbixApi('http://localhost/json_rpc.php', '', 'very_secret');
-
-        $this->assertSame('http://localhost/json_rpc.php', $zabbix->getApiUrl());
-    }
-
     /**
      * @expectedException \ZabbixApi\Exception
      * @expectedExceptionMessage Could not connect to "http://not.found.tld/json_rpc.php"
      */
     public function testZabbixApiConnectionError()
     {
-        new ZabbixApi('http://not.found.tld/json_rpc.php', 'zabbix', 'very_secret_pass');
+        $zabbix = new ZabbixApi('http://not.found.tld/json_rpc.php', 'zabbix', 'very_secret');
+
+        $zabbix->userGet();
     }
 
     /**
