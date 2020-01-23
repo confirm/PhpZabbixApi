@@ -31,7 +31,9 @@ namespace ZabbixApi;
  * Abstract class for the Zabbix API.
  */
 abstract class <CLASSNAME_ABSTRACT>
-{
+{<!START_API_CONSTANT>
+    const <PHP_CONST_NAME> = <PHP_CONST_VALUE>;
+<!END_API_CONSTANT>
     /**
      * Anonymous API functions.
      *
