@@ -28,22 +28,12 @@
 /**
  * Class name for the abstract API class.
  */
-define('CLASSNAME_ABSTRACT', 'AbstractZabbixApi');
+define('CLASSNAME_ZABBIX_API', 'ZabbixApi');
 
 /**
  * Filename for the abstract API class.
  */
-define('FILENAME_ABSTRACT', CLASSNAME_ABSTRACT.'.php');
-
-/**
- * Class name for the concrete API class.
- */
-define('CLASSNAME_CONCRETE', 'ZabbixApi');
-
-/**
- * Filename for the abstract API class.
- */
-define('FILENAME_CONCRETE', CLASSNAME_CONCRETE.'.php');
+define('FILENAME_ZABBIX_API', CLASSNAME_ZABBIX_API.'.php');
 
 /**
  * Class name for the abstract API class.

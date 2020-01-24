@@ -76,11 +76,9 @@ if (!is_dir(PATH_ZABBIX_API_CLASSES_DIRECTORY)) {
 
 // set template placeholders
 $templatePlaceholders = array(
-    'CLASSNAME_ABSTRACT' => CLASSNAME_ABSTRACT,
-    'CLASSNAME_CONCRETE' => CLASSNAME_CONCRETE,
+    'CLASSNAME_ZABBIX_API' => CLASSNAME_ZABBIX_API,
     'CLASSNAME_EXCEPTION' => CLASSNAME_EXCEPTION,
-    'FILENAME_ABSTRACT' => FILENAME_ABSTRACT,
-    'FILENAME_CONCRETE' => FILENAME_CONCRETE,
+    'FILENAME_ZABBIX_API' => FILENAME_ZABBIX_API,
     'FILENAME_EXCEPTION' => FILENAME_EXCEPTION,
 );
 
@@ -176,10 +174,10 @@ foreach ($apiClassMap->getClassMap() as $resource => $class) {
     }
 }
 
-// Build abstract template.
+// Build ZabbixApi template.
 
 // get template
-if (!$template = file_get_contents(PATH_TEMPLATES.'/abstract.tpl.php')) {
+if (!$template = file_get_contents(PATH_TEMPLATES.'/ZabbixApi.tpl.php')) {
     throw new RuntimeException('Error.');
 }
 
@@ -188,7 +186,7 @@ preg_match('/(.*)<!START_API_CONSTANT>(.*)<!END_API_CONSTANT>(.*)<!START_API_MET
 
 // sanity check
 if (6 !== count($matches)) {
-    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/abstract.tpl.php" parsing failed!');
+    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/ZabbixApi.tpl.php" parsing failed!');
 }
 
 $defines = file_get_contents(PATH_ZABBIX.'/include/defines.inc.php');
@@ -250,51 +248,26 @@ foreach ($apiArray as $resource => $actions) {
 // build file content
 $fileContent = replacePlaceholders($matches[1].$apiConstants.$matches[3].$apiMethods.$matches[5], $templatePlaceholders);
 
-// write abstract class
-if (!file_put_contents(PATH_BUILD.'/'.FILENAME_ABSTRACT, $fileContent)) {
+// write ZabbixApi class
+if (!file_put_contents(PATH_BUILD.'/'.FILENAME_ZABBIX_API, $fileContent)) {
     throw new RuntimeException('Error.');
 }
 
-echo 'BUILT: abstract class file "'.PATH_BUILD.'/'.FILENAME_ABSTRACT.'"'."\n";
+echo 'BUILT: ZabbixApi class file "'.PATH_BUILD.'/'.FILENAME_ZABBIX_API.'"'."\n";
 
-// Build concrete template.
+// Build Exception template.
 
-if (!file_exists(PATH_BUILD.'/'.FILENAME_CONCRETE)) {
-    // get template
-    if (!$template = file_get_contents(PATH_TEMPLATES.'/concrete.tpl.php')) {
-        throw new RuntimeException('Error.');
-    }
-
-    // build file content
-    $fileContent = replacePlaceholders($template, $templatePlaceholders);
-
-    // write abstract class
-    if (!file_put_contents(PATH_BUILD.'/'.FILENAME_CONCRETE, $fileContent)) {
-        throw new RuntimeException('Error.');
-    }
-
-    echo 'BUILT: conrete class file "'.PATH_BUILD.'/'.FILENAME_CONCRETE.'"'."\n";
-} else {
-    echo 'SKIPPED: concrete class file "'.PATH_BUILD.'/'.FILENAME_CONCRETE.'"'."\n";
+// get template
+if (!$template = file_get_contents(PATH_TEMPLATES.'/Exception.tpl.php')) {
+    throw new RuntimeException('Error.');
 }
 
-// Build exception template.
+// build file content
+$fileContent = replacePlaceholders($template, $templatePlaceholders);
 
-if (!file_exists(PATH_BUILD.'/'.FILENAME_EXCEPTION)) {
-    // get template
-    if (!$template = file_get_contents(PATH_TEMPLATES.'/exception.tpl.php')) {
-        throw new RuntimeException('Error.');
-    }
-
-    // build file content
-    $fileContent = replacePlaceholders($template, $templatePlaceholders);
-
-    // write abstract class
-    if (!file_put_contents(PATH_BUILD.'/'.FILENAME_EXCEPTION, $fileContent)) {
-        throw new RuntimeException('Error.');
-    }
-
-    echo 'BUILT: conrete class file "'.PATH_BUILD.'/'.FILENAME_EXCEPTION.'"'."\n";
-} else {
-    echo 'SKIPPED: concrete class file "'.PATH_BUILD.'/'.FILENAME_EXCEPTION.'"'."\n";
+// write Exception class
+if (!file_put_contents(PATH_BUILD.'/'.FILENAME_EXCEPTION, $fileContent)) {
+    throw new RuntimeException('Error.');
 }
+
+echo 'BUILT: Exception class file "'.PATH_BUILD.'/'.FILENAME_EXCEPTION.'"'."\n";

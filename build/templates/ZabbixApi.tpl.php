@@ -27,10 +27,7 @@
 
 namespace ZabbixApi;
 
-/**
- * Abstract class for the Zabbix API.
- */
-abstract class <CLASSNAME_ABSTRACT>
+final class <CLASSNAME_ZABBIX_API>
 {<!START_API_CONSTANT>
     const <PHP_CONST_NAME> = <PHP_CONST_VALUE>;
 <!END_API_CONSTANT>
@@ -156,7 +153,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * @param string $apiUrl API url
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function setApiUrl($apiUrl)
     {
@@ -170,7 +167,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * @param string $authToken API auth ID
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function setAuthToken($authToken)
     {
@@ -185,7 +182,7 @@ abstract class <CLASSNAME_ABSTRACT>
      * @param string $user HTTP basic authorization username
      * @param string $password HTTP basic authorization password
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function setBasicAuthorization($user, $password)
     {
@@ -205,7 +202,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * @param array $context Array with the SSL context
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function setSslContext($context)
     {
@@ -231,7 +228,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * @throws Exception
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function setDefaultParams($defaultParams)
     {
@@ -249,7 +246,7 @@ abstract class <CLASSNAME_ABSTRACT>
      *
      * @param bool $print Boolean if requests/responses should be printed out
      *
-     * @return <CLASSNAME_ABSTRACT>
+     * @return <CLASSNAME_ZABBIX_API>
      */
     public function printCommunication($print = true)
     {

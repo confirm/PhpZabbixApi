@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/confirm/PhpZabbixApi.svg?branch=master)](https://travis-ci.org/confirm/PhpZabbixApi)
 
-> __I'M LOOKING FOR CONTRIBUTORS, [CLICK HERE FOR MORE INFORMATIONS](https://github.com/confirm/PhpZabbixApi/issues/28)__
-
 ### About
 
 PhpZabbixApi is an open-source PHP class library to communicate with the Zabbix™ JSON-RPC API.
 
-Because PhpZabbixApi is generated directly from the origin Zabbix™ PHP front-end source code / files, each real Zabbix™ JSON-RPC API method is implemented (hard-coded) directly as an own PHP method. This means PhpZabbixApi is IDE-friendly, because you've a PHP method for each API method, and there are no PHP magic functions or alike.
+Because PhpZabbixApi is generated directly from the origin Zabbix™ PHP front-endsource code / files, each real Zabbix™ JSON-RPC API method is implemented (hard-coded) directly as an own PHP method. This means PhpZabbixApi is IDE-friendly, because you've a PHP method for each API method, and there are no PHP magic functions or alike.
 
 ### License
 
@@ -19,14 +17,14 @@ PhpZabbixApi is licensed under the MIT license.
 You can get PhpZabbixApi in 3 different ways:
 
 * [building](#building) it yourself
-* download a pre-built library [release](https://github.com/domibarton/PhpZabbixApi/releases)
+* download a pre-built library [release](https://github.com/confirm/PhpZabbixApi/releases)
 * using PHP composer / [Packagist](https://packagist.org/)
 
 Make sure the version of the library matches the Zabbix™ PHP front-end / API version.
 
 ### Building
 
-If you want to build your own library, have a look at the configuration file `inc/config.inc.php`.
+If you want to build your own library, have a look at the configuration file `build/config.inc.php`.
 You might want to point `PATH_ZABBIX`  to your Zabbix™ installation directory.
 
 If you setup everything correctly, you should be able to create the library by executing:
@@ -37,46 +35,27 @@ php build/build.php
 
 There are also pre-built libraries available in the `src/` directory, if you don't want to build it yourself.
 
-### Download
-
-[Download a release](https://github.com/domibarton/PhpZabbixApi/releases) and extract the pre-built PHP library from the `src/` directory.
-
-Make sure you've downloaded the following files and stored them in the same directory:
-
-* `ZabbixApi.php`
-* `AbstractZabbixApi.php`
-
-For example:
-
-```
-my_application
-├── index.php
-└── lib
-    ├── AbstractZabbixApi.php
-    └── ZabbixApi.php
-```
-
 ### Composer
 
 If you're using PHP composer, you can load the library directly via:
 
 ```
-composer require confirm-it-solutions/php-zabbix-api:<version>
+composer require confirm-it-solutions/php-zabbix-api
 ```
 
-All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be installed, for example:
+All [tagged](https://github.com/confirm/PhpZabbixApi/tags) versions can be installed, for example:
 
 
 ```
-composer require 'confirm-it-solutions/php-zabbix-api:^2.2'
 composer require 'confirm-it-solutions/php-zabbix-api:^2.4'
+composer require 'confirm-it-solutions/php-zabbix-api:^3.0'
 ```
 
-If you're looking for more "bleeding-edge" versions (e.g. for testing), then you could also use [branches](https://github.com/confirm-it-solutions/PhpZabbixApi/branches):
+If you're looking for more "bleeding-edge" versions (e.g. for testing), then you could also use [branches](https://github.com/confirm/PhpZabbixApi/branches):
 
 ```
-composer require 'confirm-it-solutions/php-zabbix-api:2.2@dev'
 composer require 'confirm-it-solutions/php-zabbix-api:2.4@dev'
+composer require 'confirm-it-solutions/php-zabbix-api:3.0@dev'
 ```
 
 ## Using the thing
@@ -90,27 +69,11 @@ To translate a Zabbix™ API call into a PHP method call, you can simply
 
 Example:
 
-```
-Zabbix™ API         PHP API
------------         -------
-graph.get           graphGet()
-host.massUpdate     hostMassUpdate()
-dcheck.isWritable   dcheckIsWritable()
-```
-
-### Customizing the API class
-
-By default there are only 2 classes defined:
-
-```
-AbstractZabbixApi
-└── ZabbixApi
-```
-
-If you want to customize or extend the library, you might want to do that in the `ZabbixApi` class.
-Out of the box, `ZabbixApi` is an empty class inherited from `AbstractZabbixApi`.
-
-By customizing only `ZabbixApi`, you're able to update `AbstractZabbixApi` (the build) at any time, without merging your customizations manually.
+| Zabbix™ API          | PHP API              |
+|----------------------|----------------------|
+| `graph.get`          | `graphGet()`         |
+| `host.massUpdate`    | `hostMassUpdate()`   |
+| `dcheck.isWritable`  | `dcheckIsWritable()` |
 
 ### Basic usage
 
@@ -120,6 +83,7 @@ To use the PhpZabbixApi you just have to load `ZabbixApi.php`, create a new `Zab
 <?php
 // load ZabbixApi
 require_once __DIR__.'/vendor/autoload.php';
+
 use ZabbixApi\ZabbixApi;
 use ZabbixApi\Exception;
 
