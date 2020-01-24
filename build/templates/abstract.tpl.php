@@ -35,15 +35,6 @@ abstract class <CLASSNAME_ABSTRACT>
     const <PHP_CONST_NAME> = <PHP_CONST_VALUE>;
 <!END_API_CONSTANT>
     /**
-     * Anonymous API functions.
-     *
-     * @var string[]
-     */
-    private static $anonymousFunctions = array(
-        'apiinfo.version',
-    );
-
-    /**
      * Boolean if requests/responses should be printed out (JSON).
      *
      * @var bool
@@ -210,7 +201,7 @@ abstract class <CLASSNAME_ABSTRACT>
     /**
      * Sets the context for SSL-enabled connections.
      *
-     * @see http://php.net/manual/en/context.ssl.php.
+     * @see https://php.net/manual/en/context.ssl.php.
      *
      * @param array $context Array with the SSL context
      *
@@ -490,7 +481,7 @@ abstract class <CLASSNAME_ABSTRACT>
     }
 <!START_API_METHOD>
     /**
-     * Requests the Zabbix API and returns the response of the API method "<API_METHOD>".
+     * Requests the Zabbix API and returns the response of the method "<API_METHOD>".
      *
      * The $params Array can be used, to pass parameters to the Zabbix API.
      * For more information about these parameters, check the Zabbix API
@@ -510,14 +501,7 @@ abstract class <CLASSNAME_ABSTRACT>
      */
     public function <PHP_METHOD>($params = array(), $arrayKeyProperty = '')
     {
-        // get params array for request
-        $params = $this->getRequestParamsArray($params);
-
-        // check if we've to authenticate
-        $auth = !in_array('<API_METHOD>', self::$anonymousFunctions, true);
-
-        // request
-        return $this->request('<API_METHOD>', $params, $arrayKeyProperty, $auth);
+        return $this->request('<API_METHOD>', $this->getRequestParamsArray($params), $arrayKeyProperty, <IS_AUTHENTICATION_REQUIRED>);
     }
 <!END_API_METHOD>
     /**
