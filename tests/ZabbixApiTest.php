@@ -135,6 +135,41 @@ final class ZabbixApiTest extends TestCase
         $this->removeTokenCacheDir($cacheDir);
     }
 
+    /**
+     * @dataProvider getAuthenticationRequired
+     *
+     * @param string $method
+     * @param string $apiMethod
+     * @param bool $isAuthenticationRequired
+     */
+    public function testAuthenticationRequired($method, $apiMethod, $isAuthenticationRequired)
+    {
+        $this->assertTrue(is_callable(array('ZabbixApi\ZabbixApi', $method)));
+
+        $zabbix = $this->getMockBuilder('ZabbixApi\ZabbixApi')
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->setMethods(array('request'))
+            ->getMock();
+
+        $zabbix
+            ->expects($this->once())
+            ->method('request')
+            ->with($apiMethod, array(), '', $isAuthenticationRequired);
+
+        $zabbix->$method();
+    }
+
+    public function getAuthenticationRequired()
+    {
+        return array(
+            array('method' => 'userGet', 'api_method' => 'user.get', 'is_authentication_required' => true),
+            array('method' => 'apiinfoVersion', 'api_method' => 'apiinfo.version', 'is_authentication_required' => false),
+            array('method' => 'hostGet', 'api_method' => 'host.get', 'is_authentication_required' => true),
+        );
+    }
+
     public function testZabbixApiConnectionNotTriggered()
     {
         $zabbix = new ZabbixApi('http://localhost/json_rpc.php');
