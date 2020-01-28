@@ -76,8 +76,10 @@ if (!is_dir(PATH_ZABBIX_API_CLASSES_DIRECTORY)) {
 
 // set template placeholders
 $templatePlaceholders = array(
+    'INTERFACENAME_ZABBIX_API_INTERFACE' => INTERFACENAME_ZABBIX_API_INTERFACE,
     'CLASSNAME_ZABBIX_API' => CLASSNAME_ZABBIX_API,
     'CLASSNAME_EXCEPTION' => CLASSNAME_EXCEPTION,
+    'FILENAME_ZABBIX_API_INTERFACE' => FILENAME_ZABBIX_API_INTERFACE,
     'FILENAME_ZABBIX_API' => FILENAME_ZABBIX_API,
     'FILENAME_EXCEPTION' => FILENAME_EXCEPTION,
 );
@@ -174,10 +176,10 @@ foreach ($apiClassMap->getClassMap() as $resource => $class) {
     }
 }
 
-// Build ZabbixApi template.
+// Build ZabbixApiInterface template.
 
 // get template
-if (!$template = file_get_contents(PATH_TEMPLATES.'/ZabbixApi.tpl.php')) {
+if (!$template = file_get_contents(PATH_TEMPLATES.'/ZabbixApiInterface.tpl.php')) {
     throw new RuntimeException('Error.');
 }
 
@@ -186,7 +188,7 @@ preg_match('/(.*)<!START_API_CONSTANT>(.*)<!END_API_CONSTANT>(.*)<!START_API_MET
 
 // sanity check
 if (6 !== count($matches)) {
-    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/ZabbixApi.tpl.php" parsing failed!');
+    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/ZabbixApiInterface.tpl.php" parsing failed!');
 }
 
 $defines = file_get_contents(PATH_ZABBIX.'/include/defines.inc.php');
@@ -228,6 +230,44 @@ foreach ($constantsArray['constant_names'] as $k => $name) {
 // initialize variable for API methods
 $apiMethods = '';
 
+// build API methods
+foreach ($apiArray as $resource => $actions) {
+    foreach ($actions as $action) {
+        $methodPlaceholders = array(
+            'PHP_METHOD' => $resource.ucfirst($action),
+        );
+        $apiMethods .= replacePlaceholders($matches[4], $methodPlaceholders);
+    }
+}
+
+// build file content
+$fileContent = replacePlaceholders($matches[1].$apiConstants.$matches[3].$apiMethods.$matches[5], $templatePlaceholders);
+
+// write ZabbixApiInterface class
+if (!file_put_contents(PATH_BUILD.'/'.FILENAME_ZABBIX_API_INTERFACE, $fileContent)) {
+    throw new RuntimeException('Error.');
+}
+
+echo 'BUILT: ZabbixApiInterface class file "'.PATH_BUILD.'/'.FILENAME_ZABBIX_API_INTERFACE.'"'."\n";
+
+// Build ZabbixApi template.
+
+// get template
+if (!$template = file_get_contents(PATH_TEMPLATES.'/ZabbixApi.tpl.php')) {
+    throw new RuntimeException('Error.');
+}
+
+// fetch API method block
+preg_match('/(.*)<!START_API_METHOD>(.*)<!END_API_METHOD>(.*)/s', $template, $matches);
+
+// sanity check
+if (4 !== count($matches)) {
+    throw new RuntimeException('Template "'.PATH_TEMPLATES.'/ZabbixApi.tpl.php" parsing failed!');
+}
+
+// initialize variable for API methods
+$apiMethods = '';
+
 $anonymousFunctions = array(
     'apiinfo.version',
 );
@@ -241,12 +281,11 @@ foreach ($apiArray as $resource => $actions) {
             'PHP_METHOD' => $resource.ucfirst($action),
             'IS_AUTHENTICATION_REQUIRED' => in_array($apiMethod, $anonymousFunctions, true) ? 'false' : 'true',
         );
-        $apiMethods .= replacePlaceholders($matches[4], $methodPlaceholders);
+        $apiMethods .= replacePlaceholders($matches[2], $methodPlaceholders);
     }
 }
 
-// build file content
-$fileContent = replacePlaceholders($matches[1].$apiConstants.$matches[3].$apiMethods.$matches[5], $templatePlaceholders);
+$fileContent = replacePlaceholders($matches[1].$apiMethods.$matches[3], $templatePlaceholders);
 
 // write ZabbixApi class
 if (!file_put_contents(PATH_BUILD.'/'.FILENAME_ZABBIX_API, $fileContent)) {

@@ -6,7 +6,7 @@
 
 PhpZabbixApi is an open-source PHP class library to communicate with the Zabbix™ JSON-RPC API.
 
-Because PhpZabbixApi is generated directly from the origin Zabbix™ PHP front-endsource code / files, each real Zabbix™ JSON-RPC API method is implemented (hard-coded) directly as an own PHP method. This means PhpZabbixApi is IDE-friendly, because you've a PHP method for each API method, and there are no PHP magic functions or alike.
+Because PhpZabbixApi is generated directly from the origin Zabbix™ PHP front-end source code / files, each real Zabbix™ JSON-RPC API method is implemented (hard-coded) directly as an own PHP method. This means PhpZabbixApi is IDE-friendly, because you've a PHP method for each API method, and there are no PHP magic functions or alike.
 
 ### License
 

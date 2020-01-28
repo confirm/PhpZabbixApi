@@ -27,10 +27,8 @@
 
 namespace ZabbixApi;
 
-final class <CLASSNAME_ZABBIX_API>
-{<!START_API_CONSTANT>
-    const <PHP_CONST_NAME> = <PHP_CONST_VALUE>;
-<!END_API_CONSTANT>
+final class <CLASSNAME_ZABBIX_API> implements <INTERFACENAME_ZABBIX_API_INTERFACE>
+{
     /**
      * Boolean if requests/responses should be printed out (JSON).
      *

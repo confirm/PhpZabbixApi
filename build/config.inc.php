@@ -26,6 +26,16 @@
  */
 
 /**
+ * Class name for the API interface.
+ */
+define('INTERFACENAME_ZABBIX_API_INTERFACE', 'ZabbixApiInterface');
+
+/**
+ * Filename for the API interface.
+ */
+define('FILENAME_ZABBIX_API_INTERFACE', INTERFACENAME_ZABBIX_API_INTERFACE.'.php');
+
+/**
  * Class name for the abstract API class.
  */
 define('CLASSNAME_ZABBIX_API', 'ZabbixApi');
