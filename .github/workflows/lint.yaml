@@ -1,0 +1,18 @@
+on: [push, pull_request]
+
+name: Lint
+
+jobs:
+    composer-normalize:
+        name: composer-normalize
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+
+            - name: "Run composer-normalize"
+              uses: docker://localheinz/composer-normalize-action:0.5.2
+              with:
+                  args: --dry-run
