@@ -3,6 +3,20 @@ on: [push, pull_request]
 name: Lint
 
 jobs:
+    php-cs-fixer:
+        name: PHP-CS-Fixer
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Run PHP-CS-Fixer
+              uses: docker://oskarstark/php-cs-fixer-ga:2.18.5
+              with:
+                  args: --ansi --verbose --diff --dry-run
+
     composer-normalize:
         name: composer-normalize
 
