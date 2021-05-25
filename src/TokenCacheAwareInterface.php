@@ -25,11 +25,12 @@
  * @author confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
  */
 
-namespace ZabbixApi;
+namespace Confirm\ZabbixApi;
 
-/**
- * Exception class for ZabbixApi namespace.
- */
-class Exception extends \Exception
+interface TokenCacheAwareInterface
 {
+    /**
+     * @param string $directory
+     */
+    public function setTokenCacheDir($directory);
 }
