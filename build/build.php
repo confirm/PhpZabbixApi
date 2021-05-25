@@ -26,8 +26,8 @@
  * @author confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
  */
 
-if (!in_array(PHP_SAPI, array('cli', 'phpdbg', 'embed'), true)) {
-    throw new RuntimeException('Error: '.__FILE__.' must be invoked via the CLI version of PHP, not the '.PHP_SAPI.' SAPI'.PHP_EOL);
+if (!in_array(\PHP_SAPI, array('cli', 'phpdbg', 'embed'), true)) {
+    throw new RuntimeException('Error: '.__FILE__.' must be invoked via the CLI version of PHP, not the '.\PHP_SAPI.' SAPI'.\PHP_EOL);
 }
 
 set_time_limit(0);
@@ -207,7 +207,7 @@ foreach ($constantsArray['constant_names'] as $k => $name) {
 
     foreach ($constantsArray['constant_names'] as $declaredName) {
         if (false !== strpos($value, $declaredName)) {
-            if (version_compare(PHP_VERSION, '5.6') >= 0) {
+            if (version_compare(\PHP_VERSION, '5.6') >= 0) {
                 $declaredNameValue = 'self::'.$declaredName;
                 $value = preg_replace('#\b'.$declaredName.'\b#', $declaredNameValue, $value);
             } elseif (false !== $declaredNameKey = array_search($declaredName, $constantsArray['constant_names'], true)) {
