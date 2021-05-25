@@ -8,7 +8,7 @@ on:
 
 jobs:
     test:
-        name: PHP ${{ matrix.php-version }} + Zabbix ${{ matrix.zabbix-version }}
+        name: PHP ${{ matrix.php-version }} + ${{ matrix.dependencies }}
 
         runs-on: ubuntu-latest
 
@@ -17,41 +17,29 @@ jobs:
         strategy:
             matrix:
                 php-version:
-                    - '5.4'
-                    - '5.5'
                     - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
                     - '7.3'
                     - '7.4'
+                    - '8.0'
+                dependencies: [highest]
                 allowed-to-fail: [false]
-                zabbix-version:
-                    - '3.0.0'
-                    - '3.0.32'
-                    - '3.2.0'
-                    - '3.2.11'
-                    - '3.4.0'
-                    - '3.4.15'
-                    - '4.0.0'
-                    - '4.4.0'
                 include:
-                    - php-version: '5.3'
-                      zabbix-version: '2.4.0'
+                    - php-version: '5.6'
+                      dependencies: lowest
                       allowed-to-fail: false
-                    - php-version: '5.3'
-                      zabbix-version: '2.4.8'
+                    - php-version: '7.0'
+                      dependencies: lowest
+                      allowed-to-fail: false
+                    - php-version: '8.0'
+                      dependencies: lowest
                       allowed-to-fail: false
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
-
-            - name: Get Zabbix source
-              run: |
-                mkdir -p /opt/zabbix
-                wget -qO- https://repo.zabbix.com/zabbix/$(echo ${{ matrix.zabbix-version }} | cut -d. -f-2)/ubuntu/pool/main/z/zabbix/zabbix_${{ matrix.zabbix-version }}.orig.tar.gz | tar xvz -C /opt/zabbix
-                ln -s /opt/zabbix/zabbix-${{ matrix.zabbix-version }}/frontends/php/ /opt/zabbix/frontend
 
             - name: Install PHP with extensions
               uses: shivammathur/setup-php@v2
@@ -62,13 +50,11 @@ jobs:
             - name: Add PHPUnit matcher
               run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-            - name: "Install Composer dependencies"
+            - name: "Install Composer dependencies (${{ matrix.dependencies }})"
               uses: "ramsey/composer-install@v1"
               with:
+                  dependency-versions: "${{ matrix.dependencies }}"
                   composer-options: "--prefer-dist"
 
-            - name: Build
-              run: build/build.php
-
             - name: Run Tests
-              run: vendor/bin/phpunit
+              run: vendor/bin/simple-phpunit

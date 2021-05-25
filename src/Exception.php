@@ -25,13 +25,8 @@
  * @author confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
  */
 
-namespace ZabbixApi;
+namespace Confirm\ZabbixApi;
 
-/**
- * Concrete class for the Zabbix API.
- *
- * @final since confirm-it-solutions/php-zabbix-api 2.x
- */
-class <CLASSNAME_CONCRETE> extends <CLASSNAME_ABSTRACT>
+class Exception extends \Exception
 {
 }

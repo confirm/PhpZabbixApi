@@ -25,51 +25,53 @@ THE SOFTWARE.
 @author confirm IT solutions GmbH, Rathausstrase 14, CH-6340 Baar
 EOF;
 
-// Use PHP-CS-Fixer 2+ if it is available
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setUsingCache(true)
     ->setRiskyAllowed(true)
-    ->setRules(array(
+    ->setRules([
         '@PSR2' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => true,
         'array_indentation' => true,
-        'array_syntax' => array('syntax' => 'long'),
+        'array_syntax' => ['syntax' => 'short'],
         'blank_line_before_statement' => true,
         'combine_consecutive_issets' => true,
         'combine_consecutive_unsets' => true,
         'declare_strict_types' => false,
         'dir_constant' => true,
+        'echo_tag_syntax' => ['format' => 'short'],
         'ereg_to_preg' => true,
         'explicit_string_variable' => true,
-        'global_namespace_import' => array('import_classes' => false),
-        'header_comment' => array('header' => $header),
+        'global_namespace_import' => ['import_classes' => false],
+        'header_comment' => ['header' => $header],
         'heredoc_to_nowdoc' => true,
         'linebreak_after_opening_tag' => true,
         'logical_operators' => true,
         'method_argument_space' => true,
         'multiline_whitespace_before_semicolons' => true,
+        'native_constant_invocation' => false,
         'native_function_invocation' => false,
         'no_alternative_syntax' => true,
         'no_empty_comment' => true,
-        'no_extra_consecutive_blank_lines' => array(
-            'break',
-            'continue',
-            'extra',
-            'return',
-            'throw',
-            'use',
-            'parenthesis_brace_block',
-            'square_brace_block',
-            'curly_brace_block',
-        ),
+        'no_extra_blank_lines' => [
+            'tokens' => [
+                'break',
+                'continue',
+                'extra',
+                'return',
+                'throw',
+                'use',
+                'parenthesis_brace_block',
+                'square_brace_block',
+                'curly_brace_block',
+            ],
+        ],
         'no_homoglyph_names' => true,
         'no_null_property_initialization' => true,
-        'no_short_echo_tag' => true,
         'no_spaces_inside_parenthesis' => true,
         'no_superfluous_elseif' => true,
-        'no_superfluous_phpdoc_tags' => array('allow_mixed' => true),
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
         'no_unneeded_curly_braces' => true,
         'no_unneeded_final_method' => true,
         'no_unreachable_default_argument_value' => true,
@@ -85,24 +87,25 @@ return PhpCsFixer\Config::create()
         'phpdoc_summary' => false,
         'phpdoc_to_comment' => false,
         'phpdoc_trim_consecutive_blank_line_separation' => true,
-        'phpdoc_types_order' => array(
+        'phpdoc_types_order' => [
             'null_adjustment' => 'always_last',
             'sort_algorithm' => 'none',
-        ),
+        ],
         'phpdoc_var_annotation_correct_order' => true,
         'php_unit_construct' => true,
         'php_unit_set_up_tear_down_visibility' => true,
         'php_unit_strict' => true,
         'pow_to_exponentiation' => true,
-        'psr4' => true,
+        'psr_autoloading' => true,
         'return_assignment' => true,
         'single_line_comment_style' => true,
+        'single_quote' => false,
         'void_return' => false,
         'yoda_style' => true,
-    ))
+    ])
     ->setFinder(
         PhpCsFixer\Finder::create()
             ->in(__DIR__)
-            ->exclude(array('vendor', 'build/templates'))
+            ->exclude(['vendor'])
     )
 ;

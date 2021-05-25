@@ -159,6 +159,7 @@ More information about the followed changelog format: [keepachangelog.com](http:
 #### Base branch
 
 Before writing a PR, you have to check on which branch your changes SHOULD be based.
+Please, remember that most classes provided by this package are generated using the [`confirm-it-solutions/zabbix-php-sdk-builder`](https://github.com/phansys/zabbix-php-sdk-builder) package, so maybe the changes you want to perform must be done in that project.
 
 This project follows [semver](http://semver.org/) convention for release management.
 
@@ -166,15 +167,15 @@ Here is a short table resuming on which you have to start:
 
 Kind of modification | Backward Compatible (BC) | Type of release | Branch to target        | Label |
 -------------------- | ------------------------ | --------------- | ----------------------- | ----- |
-Bug fixes            | Yes                      | Patch           | `2.x`   |       |
+Bug fixes            | Yes                      | Patch           | `3.x`   |       |
 Bug fixes            | No (Only if no choice)   | Major           | `master` |       |
-Feature              | Yes                      | Minor           | `2.x`   |       |
+Feature              | Yes                      | Minor           | `3.x`   |       |
 Feature              | No (Only if no choice)   | Major           | `master` |       |
-Deprecation          | Yes (Have to)            | Minor           | `2.x`   |       |
+Deprecation          | Yes (Have to)            | Minor           | `3.x`   |       |
 Deprecation removal  | No (Can't be)            | Major           | `master` |       |
 
 Notes:
-  * Branch `2.x` is the branch of the **latest stable** minor release and
+  * Branch `3.x` is the branch of the **latest stable** minor release and
   has to be used for Backward compatible PRs.
   * If you PR is not **Backward Compatible** but can be, it **MUST** be:
     * Changing a function/method signature? Prefer create a new one and deprecate the old one.
