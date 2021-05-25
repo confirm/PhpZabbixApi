@@ -141,10 +141,9 @@ if (version_compare(ZABBIX_API_VERSION, '2.4') >= 0) {
  * Later the get_class_methods() function will automatically invoke this
  * autoloader.
  */
-function __autoload($className)
-{
+spl_autoload_register(function ($className) {
     require PATH_ZABBIX_API_CLASSES_DIRECTORY.'/'.$className.'.php';
-}
+});
 
 /*
  * Build API array.
