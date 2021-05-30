@@ -8,7 +8,7 @@
     Different branches are used for different things:
     - 2.x is for everything backwards compatible, like patches, features and deprecation notices
     - master is for deprecation removals and other changes that cannot be done without a BC-break
-    More details here: https://github.com/confirm-it-solutions/php-zabbix-api/blob/2.x/CONTRIBUTING.md#base-branch
+    More details here: https://github.com/confirm/PhpZabbixApi/blob/2.x/CONTRIBUTING.md#base-branch
 -->
 I am targeting this branch, because {reason}.
 
@@ -24,7 +24,7 @@ Closes #{put_issue_number_here}.
 <!-- MANDATORY
     Fill the changelog part inside the code block.
     Follow this schema: http://keepachangelog.com/
-    This will end up on https://github.com/confirm-it-solutions/php-zabbix-api/releases,
+    This will end up on https://github.com/confirm/PhpZabbixApi/releases,
     please keep it short and clear and to the point
 -->
 
