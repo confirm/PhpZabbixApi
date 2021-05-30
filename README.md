@@ -10,13 +10,14 @@ The 3.x versions of this package are compatible and tested with Zabbix™ from v
 [![Test](https://github.com/confirm/PhpZabbixApi/actions/workflows/test.yaml/badge.svg)](https://github.com/confirm/PhpZabbixApi/actions/workflows/test.yaml)
 [![Lint](https://github.com/confirm/PhpZabbixApi/actions/workflows/lint.yaml/badge.svg)](https://github.com/confirm/PhpZabbixApi/actions/workflows/lint.yaml)
 
-> __WE ARE LOOKING FOR CONTRIBUTORS, [CLICK HERE FOR MORE INFORMATION](https://github.com/confirm/PhpZabbixApi/issues/28)__
-
 ## About
 
 PhpZabbixApi is an open-source PHP SDK to communicate with the [Zabbix JSON-RPC API](https://www.zabbix.com/documentation/3.4/manual/api).
 
-Because this package is generated directly from the origin Zabbix PHP front-end source code, each real Zabbix JSON-RPC API method is implemented directly as a PHP method. This means PhpZabbixApi is IDE-friendly, because you've a declared PHP method for each API method, and there are no PHP magic functions or alike.
+Because this package is generated directly from the origin Zabbix PHP front-end source code,
+each real Zabbix JSON-RPC API method is implemented directly as a PHP method. This
+means PhpZabbixApi is IDE-friendly, because you've a declared PHP method for each
+API method, and there are no PHP magic functions or alike.
 
 ## License
 
@@ -43,9 +44,15 @@ or:
 
     composer require confirm-it-solutions/php-zabbix-api:^3.2
 
-The tag names may include [build metadata](https://semver.org/#spec-item-10) (the part after the plus sign) to easily identify which range of Zabbix API versions are supported. By instance, the tag `42.3.4+z3.0.0-z3.4.15` denotes that PhpZabbixApi version `42.1.2` is compatible and tested with Zabbix API from version `3.0.0` to `3.4.15`.
+The tag names may include [build metadata](https://semver.org/#spec-item-10) (the part
+after the plus sign) to easily identify which range of Zabbix API versions are supported.
+By instance, the tag `42.1.2+z3.0.0-z3.4.15` denotes that PhpZabbixApi version `42.1.2`
+is compatible and tested with Zabbix API from version `3.0.0` to `3.4.15`.
 
-If you're looking for more *bleeding-edge* versions (e.g. for testing), then you could also use development [branches](https://github.com/confirm-it-solutions/PhpZabbixApi/branches) by setting a specific [stability flag](https://getcomposer.org/doc/04-schema.md#package-links) in the version constraint:
+If you're looking for more *bleeding-edge* versions (e.g. for testing), then you
+could also use development [branches](https://github.com/confirm-it-solutions/PhpZabbixApi/branches)
+by setting a specific [stability flag](https://getcomposer.org/doc/04-schema.md#package-links)
+in the version constraint:
 
     composer require confirm-it-solutions/php-zabbix-api:3.0@dev
 
@@ -68,7 +75,8 @@ Example:
 
 ### Basic usage
 
-To use the PhpZabbixApi you just have to load `ZabbixApi.php`, create a new `ZabbixApi` instance, and you're ready to go:
+To use the PhpZabbixApi you just have to load `ZabbixApi.php`, create a new `ZabbixApi`
+instance, and you're ready to go:
 
 ```php
 <?php
@@ -94,7 +102,8 @@ try {
 }
 ```
 
-The API can also work with **HTTP Basic Authroization**, you just have to call the constructor with additional parameters:
+The API can also work with **HTTP Basic Authroization**, you just have to call the
+constructor with additional parameters:
 
 ```php
 // Connect to Zabbix API through HTTP basic auth.
@@ -107,7 +116,9 @@ $api = new ZabbixApi(
 );
 ```
 
-If you already have an authentication token, you can pass that value as argument 6 in order to avoid the library to perform the request for the `user.login` method for requests that require an authenticated user.
+If you already have an authentication token, you can pass that value as argument
+6 in order to avoid the library to perform the request for the `user.login` method
+for requests that require an authenticated user.
 If the token is valid, you can omit the argument 2 and 3, since they will be not required:
 
 ```php
@@ -128,8 +139,11 @@ $api = new ZabbixApi(
 $api->userGet();
 ```
 
-In order to improve the response times and avoid calling the `user.login` method multiple times with the same credentials, the SDK will attempt to store the authentication token in a local temporary file, getting the value from it in consecutive calls.
-By default, this file is stored in the system's temp directory, but you can customize the path by calling the `setTokenCacheDir()` method:
+In order to improve the response times and avoid calling the `user.login` method
+multiple times with the same credentials, the SDK will attempt to store the authentication
+token in a local temporary file, getting the value from it in consecutive calls.
+By default, this file is stored in the system's temp directory, but you can customize
+the path by calling the `setTokenCacheDir()` method:
 
 ```php
 $api->setTokenCacheDir('/home/me/my-temp-dir');
@@ -137,8 +151,11 @@ $api->setTokenCacheDir('/home/me/my-temp-dir');
 
 ### HTTP client
 
-Internally, this package uses the [Guzzle](https://docs.guzzlephp.org/en/stable/) HTTP client to perform the requests against the Zabbix API.
-In order to give you more control and flexibility about the client configuration, you can pass your own implementation of `\GuzzleHttp\ClientInterface` as argument 7 for `ZabbixApi`:
+Internally, this package uses the [Guzzle](https://docs.guzzlephp.org/en/stable/)
+HTTP client to perform the requests against the Zabbix API.
+In order to give you more control and flexibility about the client configuration,
+you can pass your own implementation of `\GuzzleHttp\ClientInterface` as argument
+7 for `ZabbixApi`:
 
 ```php
 // Using your own HTTP client.
@@ -158,7 +175,8 @@ $api = new ZabbixApi(
 );
 ```
 
-Additionaly, if you prefer to provide options for the built-in client instead of provide your own client, you can pass an options array as argument 8:
+Additionaly, if you prefer to provide options for the built-in client instead of
+provide your own client, you can pass an options array as argument 8:
 
 ```php
 // Using custom options fot the built-in HTTP client.
@@ -179,13 +197,15 @@ $api = new ZabbixApi(
 );
 ```
 
-Please, note that argument 7 and 8 cannot be used together. You must choose between one of both.
+Please, note that argument 7 and 8 cannot be used together. You must choose between
+one of both.
 
 ## Examples
 
 ### Simple request
 
-Here's a simple request to fetch all defined graphs via [`graph.get`](https://www.zabbix.com/documentation/3.4/manual/api/reference/graph/get) API method:
+Here's a simple request to fetch all defined graphs via [`graph.get`](https://www.zabbix.com/documentation/3.4/manual/api/reference/graph/get)
+API method:
 
 ```php
 // Get all graphs.
@@ -199,7 +219,9 @@ foreach ($graphs as $graph) {
 }
 ```
 
-By default, the values will be returned using an associative array, but you can always choose to get instances of `\stdClass` instead, using `false` as argument 3 in the method call:
+By default, the values will be returned using an associative array, but you can always
+choose to get instances of `\stdClass` instead, using `false` as argument 3 in the
+method call:
 
 ```php
 // Get all graphs as instances of `\stdClass`.
@@ -216,7 +238,8 @@ foreach ($graphs as $graph) {
 ### Request with parameters
 
 Most of the time you want to define some specific parameters.
-Here's an example to fetch all CPU graphs via [`graph.get`](https://www.zabbix.com/documentation/3.4/manual/api/reference/graph/get) API method:
+Here's an example to fetch all CPU graphs via [`graph.get`](https://www.zabbix.com/documentation/3.4/manual/api/reference/graph/get)
+API method:
 
 ```php
 // Get all graphs named "CPU".
@@ -233,7 +256,8 @@ foreach ($cpuGraphs as $graph) {
 
 ### Define default parameters
 
-Sometimes you want to define default parameters, which will be included in each API request.
+Sometimes you want to define default parameters, which will be included in each API
+request.
 You can do that by defining the parameters in an array via `setDefaultParams()`:
 
 ```php
@@ -257,9 +281,14 @@ foreach ($cpuGraphs as $graph) {
 
 By default all API responses will be returned in an indexed array.
 
-So if you then looking for a specific named graph, you've to loop through the indexed array and compare the `name` attribute of each element. This can be a bit of a pain, and because of that, there's a simple way to get an associative array instead of an indexed one. You just have to pass the argument 2 for the method, which is the name of attribute you'd like to use as a key in the resulting array.
+So if you then looking for a specific named graph, you've to loop through the indexed
+array and compare the `name` attribute of each element. This can be a bit of a pain,
+and because of that, there's a simple way to get an associative array instead of
+an indexed one. You just have to pass the argument 2 for the method, which is the
+name of attribute you'd like to use as a key in the resulting array.
 
-Here's an example to fetch all graphs in an associative array, with the graph's `name` as array key:
+Here's an example to fetch all graphs in an associative array, with the graph's `name`
+as array key:
 
 ```php
 // Get all graphs in an associative array (key=name).
@@ -272,3 +301,5 @@ if (array_key_exists('CPU Load Zabbix Server', $graphs)) {
     echo 'Could not find graph "CPU Load Zabbix Server".';
 }
 ```
+
+> **WE ARE LOOKING FOR CONTRIBUTORS, [CLICK HERE FOR MORE INFORMATION](https://github.com/confirm/PhpZabbixApi/issues/28)**
