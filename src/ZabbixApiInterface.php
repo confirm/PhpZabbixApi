@@ -37,6 +37,8 @@ interface ZabbixApiInterface
 
     const UNAUTHORIZED_ERROR_MESSAGE = 'Not authorised.';
 
+    const UNAUTHORIZED_SESSION_TERMINATED_ERROR_MESSAGE = 'Session terminated, re-login, please.';
+
     const ACCESS_DENY_OBJECT = 0;
 
     const ACCESS_DENY_PAGE = 1;
