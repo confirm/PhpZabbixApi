@@ -84,8 +84,8 @@ instance, and you're ready to go:
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use ZabbixApi\Exception;
-use ZabbixApi\ZabbixApi;
+use Confirm\ZabbixApi\Exception;
+use Confirm\ZabbixApi\ZabbixApi;
 
 try {
     // Connect to Zabbix API.
@@ -97,7 +97,7 @@ try {
 
     // Do your stuff here.
 } catch (Exception $e) {
-    // Exception in ZabbixApi catched.
+    // Caught exception from ZabbixApi.
     echo $e->getMessage();
 }
 ```
