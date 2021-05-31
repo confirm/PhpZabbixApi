@@ -158,7 +158,9 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
 
         if (null !== $authToken) {
             $this->setAuthToken($authToken);
-        } elseif (null !== $user && null !== $password) {
+        }
+
+        if (null !== $user && null !== $password) {
             $this->user = $user;
             $this->password = $password;
         }
@@ -8570,7 +8572,8 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
             $response = $this->decodeResponse($this->response, $resultArrayKey, $assoc);
         } catch (Exception $e) {
             // If the request is not authorized due an authentication issue, attempt to login again and retry the operation.
-            if ($auth && self::UNAUTHORIZED_ERROR_CODE === $e->getCode() && self::UNAUTHORIZED_ERROR_MESSAGE === $e->getMessage() &&
+            if ($auth && self::UNAUTHORIZED_ERROR_CODE === $e->getCode() &&
+                in_array($e->getMessage(), [self::UNAUTHORIZED_ERROR_MESSAGE, self::UNAUTHORIZED_SESSION_TERMINATED_ERROR_MESSAGE], true) &&
                 $remainingAuthAttempts > 0 && null !== $this->user && null !== $this->password
             ) {
                 $this->getAuthToken(false);
@@ -8699,7 +8702,7 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
         }
 
         // No cached token found so far, so login.
-        if (null === $this->authToken) {
+        if (!$fromCache || null === $this->authToken) {
             // login to get the auth token
             $params = $this->getRequestParamsArray(['user' => $this->user, 'password' => $this->password]);
             $this->authToken = $this->userLogin($params);
