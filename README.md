@@ -1,6 +1,7 @@
 # PhpZabbixApi
 
 The 3.x versions of this package are compatible and tested with Zabbix™ from version 3.0.0 up to 3.4.15.
+If you are migrating this package from 2.x to 3.0, please follow the [upgrade notes](UPGRADE-3.0.md).
 
 [![Packagist Version](https://img.shields.io/packagist/v/confirm-it-solutions/php-zabbix-api)](https://packagist.org/packages/confirm-it-solutions/php-zabbix-api)
 [![Packagist License](https://img.shields.io/packagist/l/confirm-it-solutions/php-zabbix-api)](https://packagist.org/packages/confirm-it-solutions/php-zabbix-api)
