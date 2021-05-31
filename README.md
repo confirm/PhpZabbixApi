@@ -36,7 +36,7 @@ Then, you will be able to install the PhpZabbixApi version that is better for yo
 
     composer require confirm-it-solutions/php-zabbix-api:<version>
 
-All [tagged](https://github.com/domibarton/PhpZabbixApi/tags) versions can be installed, for example:
+All [tagged](https://github.com/confirm/PhpZabbixApi/tags) versions can be installed, for example:
 
     composer require confirm-it-solutions/php-zabbix-api:^3.0
 
