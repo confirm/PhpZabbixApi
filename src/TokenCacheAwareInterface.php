@@ -27,10 +27,9 @@
 
 namespace Confirm\ZabbixApi;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 interface TokenCacheAwareInterface
 {
-    /**
-     * @param string $directory
-     */
-    public function setTokenCacheDir($directory);
+    public function setTokenCache(CacheItemPoolInterface $tokenCache);
 }
