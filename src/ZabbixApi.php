@@ -33,6 +33,7 @@ use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\RequestOptions;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\ResponseInterface;
 
 final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
@@ -105,9 +106,9 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
     private $requestOptions = [];
 
     /**
-     * @var string|null
+     * @var CacheItemPoolInterface|null
      */
-    private $tokenCacheDir;
+    private $tokenCache;
 
     /**
      * @param string|null $apiUrl API url (e.g. https://FQDN/zabbix/api_jsonrpc.php)
@@ -259,9 +260,9 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
         return $this;
     }
 
-    public function setTokenCacheDir($directory)
+    public function setTokenCache(CacheItemPoolInterface $tokenCache)
     {
-        $this->tokenCacheDir = $directory;
+        $this->tokenCache = $tokenCache;
     }
 
     /**
@@ -8676,41 +8677,31 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
             return $this->authToken;
         }
 
-        $tokenCacheDir = null !== $this->tokenCacheDir ? $this->tokenCacheDir : sys_get_temp_dir();
-        $tokenCacheFile = null;
-
-        // Build filename for cached auth token.
-        if ($tokenCacheDir && is_dir($tokenCacheDir)) {
+        if ($this->tokenCache) {
+            // Build key for cached auth token.
             $uid = function_exists('posix_getuid') ? posix_getuid() : -1;
-            $tokenCacheFile = $tokenCacheDir.'/.zabbixapi-token-'.md5($this->user.'|'.$uid);
+            $tokenCacheKey = 'zabbixapi-token-'.md5($this->user.'|'.$uid);
         }
 
-        if ($fromCache) {
-            // Try to read cached auth token.
-            if (null !== $tokenCacheFile && is_file($tokenCacheFile)) {
-                $cachedToken = @file_get_contents($tokenCacheFile);
+        if ($fromCache && $this->tokenCache) {
+            $cacheItem = $this->tokenCache->getItem($tokenCacheKey);
 
-                if (false === $cachedToken) {
-                    // Unlink corrupted cached token file.
-                    @unlink($tokenCacheFile);
-
-                    throw new Exception('Failed to read cached token.');
-                }
-
-                $this->authToken = $cachedToken;
+            if ($cacheItem->isHit()) {
+                $this->authToken = $cacheItem->get();
             }
         }
 
-        // No cached token found so far, so login.
+        // No cached token in use, login.
         if (!$fromCache || null === $this->authToken) {
-            // login to get the auth token
+            // Login to get the auth token.
             $params = $this->getRequestParamsArray(['user' => $this->user, 'password' => $this->password]);
             $this->authToken = $this->userLogin($params);
 
-            // Persist cached auth token.
-            if (null !== $tokenCacheFile) {
-                @file_put_contents($tokenCacheFile, $this->authToken);
-                @chmod($tokenCacheFile, 0600);
+            if ($this->tokenCache) {
+                // Cache auth token.
+                $cacheItem = $this->tokenCache->getItem($tokenCacheKey);
+                $cacheItem->set($this->authToken);
+                $this->tokenCache->save($cacheItem);
             }
         }
 

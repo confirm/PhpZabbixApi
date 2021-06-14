@@ -140,16 +140,6 @@ $api = new ZabbixApi(
 $api->userGet();
 ```
 
-In order to improve the response times and avoid calling the `user.login` method
-multiple times with the same credentials, the SDK will attempt to store the authentication
-token in a local temporary file, getting the value from it in consecutive calls.
-By default, this file is stored in the system's temp directory, but you can customize
-the path by calling the `setTokenCacheDir()` method:
-
-```php
-$api->setTokenCacheDir('/home/me/my-temp-dir');
-```
-
 ### HTTP client
 
 Internally, this package uses the [Guzzle](https://docs.guzzlephp.org/en/stable/)
@@ -176,7 +166,7 @@ $api = new ZabbixApi(
 );
 ```
 
-Additionaly, if you prefer to provide options for the built-in client instead of
+Additionally, if you prefer to provide options for the built-in client instead of
 provide your own client, you can pass an options array as argument 8:
 
 ```php
@@ -200,6 +190,21 @@ $api = new ZabbixApi(
 
 Please, note that argument 7 and 8 cannot be used together. You must choose between
 one of both.
+
+### Authentication token caching
+
+In order to improve the response times avoiding the call for the `user.login` method
+in each request, you can configure a [PSR-6](https://www.php-fig.org/psr/psr-6/)
+caching backend for the authentication token. This way the SDK will get the cached
+token after the first login and until its expiration.
+The following example uses a fictional `Psr6FilesystemAdapter` class, but you can
+choose any [available implementation](https://packagist.org/providers/psr/cache-implementation):
+
+```php
+/** @var \Psr\Cache\CacheItemPoolInterface $psr6Cache */
+$psr6Cache = new Psr6FilesystemAdapter();
+$api->setTokenCache($psr6Cache);
+```
 
 ## Examples
 

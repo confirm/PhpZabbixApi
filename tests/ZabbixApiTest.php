@@ -37,6 +37,7 @@ use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
  * @author Javier Spagnoletti <phansys@gmail.com>
@@ -67,20 +68,17 @@ final class ZabbixApiTest extends TestCase
         $this->assertGreaterThanOrEqual(668, count($ro->getConstants()));
     }
 
-    public function testUserLoginOnConsecutiveCalls()
+    public function testAuthenticationTokenCache()
     {
         $url = 'https://local.zabbix.tld/json_rpc.php';
         $user = 'zabbix';
         $pass = 'very_secret';
         $authToken = '4u7ht0k3n';
-        $cacheDir = __DIR__.'/.token_cache';
-
-        $this->createTokenCacheDir($cacheDir);
 
         $httpClient = $this->createMock(ClientInterface::class);
 
         $zabbix = new ZabbixApi($url, $user, $pass, null, null, null, $httpClient);
-        $zabbix->setTokenCacheDir($cacheDir);
+        $zabbix->setTokenCache(new NullAdapter());
 
         $httpClient
             ->expects($this->exactly(2))
@@ -112,8 +110,6 @@ final class ZabbixApiTest extends TestCase
             });
 
         $this->assertSame([], $zabbix->triggerGet());
-
-        $this->removeTokenCacheDir($cacheDir);
     }
 
     /**
@@ -165,13 +161,7 @@ final class ZabbixApiTest extends TestCase
                 return $response;
             });
 
-        $cacheDir = __DIR__.'/.token_cache';
-        $this->createTokenCacheDir($cacheDir);
-
         $zabbix = new ZabbixApi($url, $user, $pass, null, null, null, $httpClient);
-        $zabbix->setTokenCacheDir($cacheDir);
-
-        $this->removeTokenCacheDir($cacheDir);
 
         $this->assertIsCallable([$zabbix, $method]);
 
@@ -1647,37 +1637,5 @@ final class ZabbixApiTest extends TestCase
         yield ['ZBX_VALID_OK'];
         yield ['ZBX_VALID_WARNING'];
         yield ['ZBX_WIDGET_ROWS'];
-    }
-
-    /**
-     * @param string $cacheDir
-     */
-    private function createTokenCacheDir($cacheDir)
-    {
-        if (is_dir($cacheDir)) {
-            return;
-        }
-
-        mkdir($cacheDir);
-    }
-
-    /**
-     * @param string $cacheDir
-     */
-    private function removeTokenCacheDir($cacheDir)
-    {
-        if (!is_dir($cacheDir)) {
-            return;
-        }
-
-        // Remove the token cache directory.
-        foreach ((array_reverse(glob($cacheDir.'/.*'))) as $file) {
-            if (is_dir($file)) {
-                continue;
-            }
-            unlink($file);
-        }
-
-        rmdir($cacheDir);
     }
 }

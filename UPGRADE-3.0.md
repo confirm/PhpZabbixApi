@@ -93,3 +93,12 @@ This package now relies on the [Guzzle](https://docs.guzzlephp.org/en/stable/) H
 ReST RPC API.
 In order to give you more flexibility, you can provide your own pre-configured client or pass custom options to
 the built-in client.
+
+## Authentication token caching
+
+Unless it is explicitly configured, the `ZabbixApi` class does not provide filesystem
+based caching for the authentication token anymore.
+It implements the `TokenCacheAwareInterface` interface, which declares the `setTokenCache()`
+method for this purpose. It accepts an instance of [PSR-6](https://www.php-fig.org/psr/psr-6/)
+`\Psr\Cache\CacheItemPoolInterface`, this way you can choose between a [wide variety](https://packagist.org/providers/psr/cache-implementation)
+of standardized caching backends for the authentication token.
