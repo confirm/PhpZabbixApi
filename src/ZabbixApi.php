@@ -8660,6 +8660,8 @@ final class ZabbixApi implements ZabbixApiInterface, TokenCacheAwareInterface
             return $this->responseDecoded['result'];
         }
 
+        assert($this->responseDecoded instanceof \stdClass);
+
         if (property_exists($this->responseDecoded, 'error') && $error = $this->responseDecoded->error) {
             throw new Exception($error->data, $error->code);
         }
