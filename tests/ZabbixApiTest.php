@@ -37,7 +37,7 @@ use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * @author Javier Spagnoletti <phansys@gmail.com>
@@ -78,7 +78,8 @@ final class ZabbixApiTest extends TestCase
         $httpClient = $this->createMock(ClientInterface::class);
 
         $zabbix = new ZabbixApi($url, $user, $pass, null, null, null, $httpClient);
-        $zabbix->setTokenCache(new NullAdapter());
+        $psr6Cache = new ArrayAdapter();
+        $zabbix->setTokenCache($psr6Cache);
 
         $httpClient
             ->expects($this->exactly(2))
@@ -109,7 +110,19 @@ final class ZabbixApiTest extends TestCase
                 return $response;
             });
 
+        $this->assertEmpty($psr6Cache->getValues());
+
         $this->assertSame([], $zabbix->triggerGet());
+        $this->assertNotEmpty($psr6Cache->getValues());
+
+        $tokenCacheKey = array_keys($psr6Cache->getValues())[0];
+
+        $tokenCacheItem = $psr6Cache->getItem($tokenCacheKey);
+
+        $this->assertTrue($tokenCacheItem->isHit());
+        $this->assertSame($authToken, $tokenCacheItem->get());
+
+        $psr6Cache->clear();
     }
 
     /**
