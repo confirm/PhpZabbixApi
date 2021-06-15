@@ -9,6 +9,7 @@ If you are migrating this package from 2.x to 3.0, please follow the [upgrade no
 [![Packagist Downloads](https://img.shields.io/packagist/dt/confirm-it-solutions/php-zabbix-api)](https://packagist.org/packages/confirm-it-solutions/php-zabbix-api/stats)
 
 [![Test](https://github.com/confirm/PhpZabbixApi/actions/workflows/test.yaml/badge.svg)](https://github.com/confirm/PhpZabbixApi/actions/workflows/test.yaml)
+[![Quality assurance](https://github.com/confirm/PhpZabbixApi/actions/workflows/qa.yaml/badge.svg)](https://github.com/confirm/PhpZabbixApi/actions/workflows/qa.yaml)
 [![Lint](https://github.com/confirm/PhpZabbixApi/actions/workflows/lint.yaml/badge.svg)](https://github.com/confirm/PhpZabbixApi/actions/workflows/lint.yaml)
 
 ## About
