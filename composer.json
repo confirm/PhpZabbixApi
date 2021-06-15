@@ -38,7 +38,9 @@
         "symfony/phpunit-bridge": "^5.2"
     },
     "suggest": {
-        "ext-posix": "Used to get the real user ID of the current process."
+        "ext-curl": "Required for sending concurrent requests.",
+        "ext-posix": "Used to get the real user ID of the current process.",
+        "lib-curl": "Version >= 7.19.4 compiled with OpenSSL and zlib is required for sending concurrent requests."
     },
     "config": {
         "sort-packages": true
